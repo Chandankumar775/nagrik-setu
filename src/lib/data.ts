@@ -19,9 +19,8 @@ const descriptions = [
 ];
 
 const generateRandomAddress = () => {
-    const streets = ['Oak St', 'Pine St', 'Maple Ave', 'Cedar Ln', 'Elm St'];
-    const cities = ['Springfield', 'Rivertown', 'Mapleton', 'Oakville'];
-    return `${Math.floor(Math.random() * 900) + 100} ${getRandom(streets)}, ${getRandom(cities)}`;
+    const streets = ['Panchayat Ghar Road', 'Main Bazaar', 'Badhauli-Sadhaura Road', 'Link Road', 'Village Outskirts'];
+    return `${getRandom(streets)}, Badhauli Village, Haryana, 8997`;
 }
 
 // Pre-populating with some data only if reports array is empty
@@ -35,8 +34,8 @@ if (reports.length === 0) {
             category: getRandom(categories),
             description: description,
             location: {
-                lat: 34.0522 + (Math.random() - 0.5) * 0.1, // around LA
-                lng: -118.2437 + (Math.random() - 0.5) * 0.1,
+                lat: 30.3953 + (Math.random() - 0.5) * 0.05, // around Badhauli, Haryana
+                lng: 77.1008 + (Math.random() - 0.5) * 0.05,
             },
             address: generateRandomAddress(),
             status: getRandom(statuses),
@@ -71,8 +70,8 @@ export const getRandomReportData = (trackingId: string): Report => {
         category: getRandom(categories),
         description,
         location: {
-            lat: 34.0522 + (Math.random() - 0.5) * 0.1,
-            lng: -118.2437 + (Math.random() - 0.5) * 0.1,
+            lat: 30.3953 + (Math.random() - 0.5) * 0.05, // around Badhauli, Haryana
+            lng: 77.1008 + (Math.random() - 0.5) * 0.05,
         },
         address: generateRandomAddress(),
         status,
