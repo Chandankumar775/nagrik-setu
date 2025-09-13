@@ -3,7 +3,6 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { addReport, getReportByTrackingId as getReport, getReports as getAllReports } from '@/lib/data';
-import { intelligentReportCategorization } from '@/ai/flows/intelligent-report-categorization';
 import type { Report, ReportCategory } from '@/lib/types';
 
 // Schema for form submission
@@ -62,14 +61,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
     const category: ReportCategory = 'Other';
     const isUrgent = false;
 
-    // 1. Get AI-based category and urgency
-    // const categorizationResult = await intelligentReportCategorization({
-    //   reportDescription: description,
-    // });
-    // const category = categorizationResult.category as ReportCategory;
-    // const isUrgent = categorizationResult.isUrgent;
-
-    // 2. Get address from coordinates
+    // 1. Get address from coordinates
     const address = await getAddressFromCoordinates(lat, lng);
 
     // In a real app, you would handle file uploads to a cloud storage (e.g., S3, Firebase Storage)
@@ -77,10 +69,10 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
     const photo = formData.get('photo') as File;
     const photoUrl = photo && photo.size > 0 ? `https://picsum.photos/seed/${Date.now()}/400/300` : undefined;
 
-    // 3. Generate tracking ID
+    // 2. Generate tracking ID
     const trackingId = `CC-${String(Date.now()).slice(-6)}`;
 
-    // 4. Save to our "database"
+    // 3. Save to our "database"
     const newReport = await addReport({
       trackingId,
       description,
@@ -91,10 +83,10 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
       isUrgent,
     });
     
-    // 5. Revalidate admin path to show new report
+    // 4. Revalidate admin path to show new report
     revalidatePath('/admin');
     
-    // 6. Return success state with the new report
+    // 5. Return success state with the new report
     return {
       message: 'Report submitted successfully!',
       report: newReport,
