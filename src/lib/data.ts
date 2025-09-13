@@ -3,6 +3,33 @@ import { Report, ReportStatus, ReportCategory } from '@/lib/types';
 // In-memory store for reports
 let reports: Report[] = [];
 
+// A specific set of 10 mock reports for predictable demoing
+const mockReports: Report[] = [
+    // 1 (Resolved)
+    { id: 'rep-mock-1', trackingId: 'CC-MOCK-1', category: 'Pothole', description: 'Large pothole in front of the local market in Mumbai, causing severe traffic disruption.', location: { lat: 19.0760, lng: 72.8777 }, address: 'Near Dadar Market, Mumbai, Maharashtra', status: 'Resolved', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-10T09:00:00Z'), updatedAt: new Date('2024-07-15T14:30:00Z') },
+    // 2 (In Progress)
+    { id: 'rep-mock-2', trackingId: 'CC-MOCK-2', category: 'Broken Streetlight', description: 'Streetlight on corner of Park Street is out, area is very dark and unsafe at night.', location: { lat: 22.5596, lng: 88.3541 }, address: 'Park Street, Kolkata, West Bengal', status: 'In Progress', isUrgent: true, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-18T22:15:00Z'), updatedAt: new Date('2024-07-19T11:00:00Z') },
+    // 3 (Acknowledged)
+    { id: 'rep-mock-3', trackingId: 'CC-MOCK-3', category: 'Overflowing Trash Bin', description: 'Community trash bin near the temple in Varanasi has not been emptied for a week.', location: { lat: 25.3176, lng: 82.9739 }, address: 'Near Kashi Vishwanath Temple, Varanasi, Uttar Pradesh', status: 'Acknowledged', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-20T11:45:00Z'), updatedAt: new Date('2024-07-20T16:00:00Z') },
+    // 4 (Resolved)
+    { id: 'rep-mock-4', trackingId: 'CC-MOCK-4', category: 'Water Leak', description: 'Clean water pipe is leaking heavily on the main road in Jaipur.', location: { lat: 26.9124, lng: 75.7873 }, address: 'Hawa Mahal Road, Jaipur, Rajasthan', status: 'Resolved', isUrgent: true, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-12T08:00:00Z'), updatedAt: new Date('2024-07-13T17:00:00Z') },
+    // 5 (Submitted)
+    { id: 'rep-mock-5', trackingId: 'CC-MOCK-5', category: 'Other', description: 'Stray dogs are causing issues in the residential area of Sector 17.', location: { lat: 30.7415, lng: 76.7766 }, address: 'Sector 17, Chandigarh', status: 'Submitted', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date(), updatedAt: new Date() },
+    // 6 (Resolved)
+    { id: 'rep-mock-6', trackingId: 'CC-MOCK-6', category: 'Pothole', description: 'Series of potholes on the road to the IT park.', location: { lat: 12.9716, lng: 77.5946 }, address: 'Electronic City, Bengaluru, Karnataka', status: 'Resolved', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-01T10:00:00Z'), updatedAt: new Date('2024-07-08T12:00:00Z') },
+    // 7 (Resolved)
+    { id: 'rep-mock-7', trackingId: 'CC-MOCK-7', category: 'Traffic Signal Malfunction', description: 'The traffic signal at the main Chennai crossing is stuck on green, very dangerous.', location: { lat: 13.0827, lng: 80.2707 }, address: 'Anna Salai, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: true, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-19T18:00:00Z'), updatedAt: new Date('2024-07-19T20:30:00Z') },
+    // 8 (Resolved)
+    { id: 'rep-mock-8', trackingId: 'CC-MOCK-8', category: 'Overflowing Trash Bin', description: 'Garbage overflowing at Marina Beach entrance.', location: { lat: 13.0500, lng: 80.2824 }, address: 'Marina Beach, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-14T13:00:00Z'), updatedAt: new Date('2024-07-16T11:00:00Z') },
+    // 9 (Rejected)
+    { id: 'rep-mock-9', trackingId: 'CC-MOCK-9', category: 'Other', description: 'My neighbour plays loud music. Please tell them to stop.', location: { lat: 28.6139, lng: 77.2090 }, address: 'Connaught Place, New Delhi, Delhi', status: 'Rejected', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-21T19:00:00Z'), updatedAt: new Date('2024-07-21T19:30:00Z') },
+    // 0 -> 10 (Rejected)
+    { id: 'rep-mock-0', trackingId: 'CC-MOCK-0', category: 'Other', description: 'A cat is stuck on my roof.', location: { lat: 17.3850, lng: 78.4867 }, address: 'Charminar, Hyderabad, Telangana', status: 'Rejected', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-20T19:00:00Z'), updatedAt: new Date('2024-07-20T19:30:00Z') },
+     // 11 -> Should also be rejected
+    { id: 'rep-mock-11', trackingId: 'CC-MOCK-11', category: 'Broken Streetlight', description: 'The light is too bright, it shines in my window.', location: { lat: 18.5204, lng: 73.8567 }, address: 'Koregaon Park, Pune, Maharashtra', status: 'Rejected', isUrgent: false, photoUrl: 'https://i.postimg.cc/NjsXdMjj/images.jpg', submittedAt: new Date('2024-07-18T23:00:00Z'), updatedAt: new Date('2024-07-19T09:00:00Z') },
+];
+
+
 // a simple function to get a random element from an array
 const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
@@ -25,12 +52,16 @@ const generateRandomAddress = () => {
 
 // Pre-populating with some data only if reports array is empty
 if (reports.length === 0) {
-    for (let i = 1; i <= 25; i++) {
+    // Adding the specific mock reports first
+    reports.push(...mockReports);
+    
+    // Add some more random ones to populate the admin dashboard
+    for (let i = 1; i <= 15; i++) {
         const submittedAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
         const description = getRandom(descriptions);
         reports.push({
-            id: `rep-${i}`,
-            trackingId: `CC-${String(Date.now()).slice(-4)}${i}`,
+            id: `rep-rand-${i}`,
+            trackingId: `CC-RAND-${String(Date.now()).slice(-4)}${i}`,
             category: getRandom(categories),
             description: description,
             location: {
@@ -56,7 +87,35 @@ export const getReports = async (): Promise<Report[]> => {
 
 export const getReportByTrackingId = async (trackingId: string): Promise<Report | undefined> => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    return reports.find(report => report.trackingId === trackingId);
+    
+    // First, try to find a real report
+    const realReport = reports.find(report => report.trackingId === trackingId);
+    if (realReport) {
+        return realReport;
+    }
+
+    // If not found, use the new demo logic
+    const lastChar = trackingId.slice(-1);
+    const lastDigit = parseInt(lastChar, 10);
+
+    if (!isNaN(lastDigit)) {
+        // '0' corresponds to the 10th report in our 0-indexed array (mockReports[9])
+        // '1' corresponds to mockReports[0], etc.
+        let report;
+        if (lastDigit === 0) {
+            report = mockReports[9]; // CC-MOCK-0
+        } else if (lastDigit > 0 && lastDigit <= 9) {
+            report = mockReports[lastDigit - 1];
+        }
+
+        if (report) {
+            // Return a copy with the user's trackingId
+            return { ...report, trackingId: trackingId };
+        }
+    }
+    
+    // Fallback to original random generator if last digit is not a number or out of range
+    return getRandomReportData(trackingId);
 };
 
 // Generates a random report for prototyping when a tracking ID is not found
