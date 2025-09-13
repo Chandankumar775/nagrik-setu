@@ -7,13 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ListFilter, AlertCircle, Clock, CheckCircle2, Hourglass, Wrench, BarChartHorizontal, PieChart, ShieldAlert } from 'lucide-react';
+import { ListFilter, AlertCircle, Clock, CheckCircle2, TrafficCone, Lightbulb, Trash2, Droplets, ShieldAlert, BarChartHorizontal, PieChart } from 'lucide-react';
 import { ReportMap } from './ReportMap';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import Image from 'next/image';
 import { format, formatDistanceToNow, startOfWeek, endOfWeek } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
-import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer, Pie, Cell } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 
 
@@ -26,11 +26,11 @@ const statusColors: Record<ReportStatus, string> = {
 };
 
 const categoryIcons: Record<ReportCategory, React.ReactNode> = {
-    'Pothole': <Wrench className="w-4 h-4 text-gray-500"/>,
-    'Broken Streetlight': <Wrench className="w-4 h-4 text-gray-500"/>,
-    'Overflowing Trash Bin': <Wrench className="w-4 h-4 text-gray-500"/>,
-    'Traffic Signal Malfunction': <Wrench className="w-4 h-4 text-gray-500"/>,
-    'Water Leak': <Wrench className="w-4 h-4 text-gray-500"/>,
+    'Pothole': <TrafficCone className="w-4 h-4 text-gray-500"/>,
+    'Broken Streetlight': <Lightbulb className="w-4 h-4 text-gray-500"/>,
+    'Overflowing Trash Bin': <Trash2 className="w-4 h-4 text-gray-500"/>,
+    'Traffic Signal Malfunction': <AlertCircle className="w-4 h-4 text-red-500"/>,
+    'Water Leak': <Droplets className="w-4 h-4 text-blue-500"/>,
     'Other': <AlertCircle className="w-4 h-4 text-gray-500"/>,
 };
 
@@ -85,7 +85,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
             return acc;
         }, {} as Record<ReportCategory, number>);
         
-        return Object.entries(dist).map(([name, value]) => ({ name, value, fill: `hsl(var(--chart-${Object.keys(dist).indexOf(name) + 1}))` }));
+        return Object.entries(dist).map(([name, value]) => ({ name, value, fill: `hsl(var(--chart-${Object.keys(dist).indexOf(name) + 1}))` })).sort((a, b) => b.value - a.value);
     }, [reports]);
     
     const reportsByDay = useMemo(() => {
@@ -115,27 +115,19 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
                         <CardDescription>Distribution of all submitted reports.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ChartContainer config={{}} className="h-64 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                                    <Pie data={categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                        const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
-                                        const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                                        const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                                        return (
-                                          <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
-                                            {`${(percent * 100).toFixed(0)}%`}
-                                          </text>
-                                        );
-                                      }}>
-                                      {categoryDistribution.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                                      ))}
-                                    </Pie>
-                                    <ChartLegend content={<ChartLegendContent nameKey="name" />} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                         <ChartContainer config={{ value: { label: 'Reports', color: 'hsl(var(--accent))' } }} className="h-64 w-full">
+                            <BarChart accessibilityLayer data={categoryDistribution} layout="vertical" margin={{ top: 0, right: 20, bottom: 0, left: 50 }}>
+                                <CartesianGrid horizontal={false} />
+                                <YAxis dataKey="name" type="category" tickLine={false} tickMargin={10} axisLine={false} hide />
+                                <XAxis dataKey="value" type="number" hide />
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Bar dataKey="value" fill="hsl(var(--accent))" radius={4} layout="vertical">
+                                     {categoryDistribution.map((entry) => (
+                                        <Cell key={entry.name} fill={entry.fill} />
+                                     ))}
+                                </Bar>
+                                 <ChartLegend content={<ChartLegendContent />} />
+                            </BarChart>
                         </ChartContainer>
                     </CardContent>
                 </Card>
