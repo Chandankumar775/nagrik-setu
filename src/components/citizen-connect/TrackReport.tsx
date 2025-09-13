@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle, Image as ImageIcon, User } from 'lucide-react';
+import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle, User, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +17,12 @@ import Image from 'next/image';
 
 const statusSteps: ReportStatus[] = ['Submitted', 'Acknowledged', 'In Progress', 'Resolved'];
 
-const statusIcons: Record<ReportStatus, React.ReactNode> = {
-  Submitted: <CheckCircle />,
-  Acknowledged: <CheckCircle />,
-  'In Progress': <Hourglass />,
-  Resolved: <ShieldCheck />,
-  Rejected: <XCircle />,
+const statusInfo: Record<ReportStatus, { icon: React.ReactNode, text: string, color: string }> = {
+  Submitted: { icon: <CheckCircle />, text: 'Submitted', color: 'bg-blue-500' },
+  Acknowledged: { icon: <CheckCircle />, text: 'Acknowledged', color: 'bg-yellow-500' },
+  'In Progress': { icon: <Hourglass />, text: 'In Progress', color: 'bg-orange-500' },
+  Resolved: { icon: <ShieldCheck />, text: 'Resolved', color: 'bg-green-500' },
+  Rejected: { icon: <XCircle />, text: 'Rejected', color: 'bg-destructive' },
 }
 
 export function TrackReport() {
@@ -44,14 +44,11 @@ export function TrackReport() {
         const result = await getReportByTrackingId(idToSearch);
         if (result) {
           setReport(result);
-          // Update URL without reloading page
-          window.history.pushState({}, '', `/track?id=${idToSearch}`);
         } else {
-          // If a report isn't found, use our mock data logic
-          const mockReport = await getReportByTrackingId(idToSearch);
-          setReport(mockReport);
-          window.history.pushState({}, '', `/track?id=${idToSearch}`);
+          setReport(null);
+          setError('No report found with this tracking ID. Please check the ID and try again.');
         }
+        window.history.pushState({}, '', `/track?id=${idToSearch}`);
       } catch (e) {
           setReport(null);
           setError('An error occurred while fetching the report.');
@@ -65,7 +62,7 @@ export function TrackReport() {
       setTrackingId(initialId);
       handleSearch(initialId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -74,7 +71,7 @@ export function TrackReport() {
       <div className="flex w-full items-center space-x-2">
         <Input
           type="text"
-          placeholder="Enter your tracking ID (e.g., CC-123456)"
+          placeholder="Enter your tracking ID (e.g., CC-MOCK-1)"
           value={trackingId}
           onChange={(e) => setTrackingId(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch(trackingId)}
@@ -84,6 +81,14 @@ export function TrackReport() {
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
           <span className="sr-only">Search</span>
         </Button>
+      </div>
+      
+      {/* Breadcrumb */}
+      <div className="text-sm text-muted-foreground">
+        <a href="/" className="hover:underline">Home</a>
+        {' > '}
+        <a href="/track" className="hover:underline">Track Report</a>
+        {report && ' > Status'}
       </div>
 
       {isPending && (
@@ -101,15 +106,15 @@ export function TrackReport() {
       )}
 
       {report && !isPending && (
-        <Card className="w-full animate-in fade-in-50 duration-500 overflow-hidden">
+        <Card className="w-full animate-in fade-in-50 duration-500 overflow-hidden border">
           <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="font-headline">Report Status</CardTitle>
-                  <CardDescription>Tracking ID: {report.trackingId}</CardDescription>
+                  <CardTitle className="font-headline text-blue-800">Report Status</CardTitle>
+                  <CardDescription className="font-mono font-bold text-lg">Tracking ID: {report.trackingId}</CardDescription>
                 </div>
-                <Badge variant={report.status === 'Rejected' ? 'destructive' : 'secondary'} className="whitespace-nowrap flex items-center gap-2">
-                   {statusIcons[report.status]}
+                <Badge variant={report.status === 'Rejected' ? 'destructive' : 'default'} className={cn('whitespace-nowrap flex items-center gap-2 text-base', statusInfo[report.status].color)}>
+                   {React.cloneElement(statusInfo[report.status].icon as React.ReactElement, { className: 'w-5 h-5'})}
                    {report.status}
                 </Badge>
               </div>
@@ -117,56 +122,55 @@ export function TrackReport() {
           <CardContent className="grid gap-6 p-6">
             
             <StatusTimeline currentStatus={report.status} />
-            
-            <div className='grid md:grid-cols-2 gap-6'>
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground"><Tag className="w-4 h-4" /> Category</div>
-                        <p>{report.category}</p>
-                    </div>
-                    <div className="grid gap-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground"><User className="w-4 h-4" /> Submitted By</div>
-                        <p>{report.submittedBy || 'Anonymous'}</p>
-                    </div>
-                  </div>
-                   <div className="grid gap-1">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="w-4 h-4" /> Location</div>
-                      <p>{report.address}</p>
-                  </div>
-                 <div className="grid gap-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground"><MessageSquare className="w-4 h-4" /> Description</div>
-                    <p className="bg-muted/50 p-3 rounded-md text-sm">{report.description}</p>
-                </div>
-                </div>
 
-                <div className="grid gap-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground"><ImageIcon className="w-4 h-4" /> Photo Evidence</div>
-                    {report.photoUrl ? (
-                      <Image src={report.photoUrl} alt="Report photo" width={400} height={300} className="rounded-lg border object-cover w-full aspect-[4/3]" data-ai-hint="pothole road" />
-                    ) : (
-                      <div className="w-full aspect-[4/3] bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm">
-                        No photo provided
-                      </div>
-                    )}
-                </div>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
+              <InfoRow label="Category" value={report.category} icon={<Tag />} />
+              <InfoRow label="Submitted By" value={report.submittedBy || 'Anonymous'} icon={<User />} />
+              <InfoRow label="Submitted On" value={format(new Date(report.submittedAt), "dd-MM-yyyy")} icon={<Calendar />} />
+              <InfoRow label="Last Updated" value={format(new Date(report.updatedAt), "dd-MM-yyyy")} icon={<Clock />} />
+              <div className="md:col-span-2">
+                <InfoRow label="Location" value={report.address} icon={<MapPin />} />
+              </div>
+              <div className="md:col-span-2">
+                <InfoRow label="Description" value={report.description} icon={<MessageSquare />} multiline />
+              </div>
+               <div className="md:col-span-2">
+                <h4 className="font-semibold text-sm flex items-center gap-2 text-muted-foreground"><MessageSquare className="w-4 h-4" /> Photo Evidence</h4>
+                {report.photoUrl ? (
+                  <div className="mt-2 border rounded-md p-2 w-48 h-36 relative">
+                     <Image src={report.photoUrl} alt="Report photo" layout="fill" className="rounded-md object-cover" data-ai-hint="pothole road" />
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic mt-1">No photo provided</p>
+                )}
+               </div>
             </div>
              
           </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row justify-between text-xs text-muted-foreground border-t bg-muted/30 pt-4 p-6 gap-2 sm:gap-0">
-            <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Submitted: {format(new Date(report.submittedAt), "PPP")}</span>
+          <CardFooter className="flex-col items-start text-sm text-muted-foreground border-t bg-muted/30 p-6 gap-2">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4"/>
+              <strong>Need Help?</strong> Contact your local municipal office.
             </div>
-            <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                 <span>Last updated: {formatDistanceToNow(new Date(report.updatedAt), { addSuffix: true })}</span>
-            </div>
+            <span>For urgent complaints call 1800-XXX-XXXX.</span>
           </CardFooter>
         </Card>
       )}
     </div>
   );
+}
+
+function InfoRow({ label, value, icon, multiline = false }: { label: string, value: string, icon: React.ReactNode, multiline?: boolean}) {
+  return (
+    <div className='grid gap-1'>
+      <h4 className="font-semibold text-sm flex items-center gap-2 text-muted-foreground">{React.cloneElement(icon as React.ReactElement, { className: 'w-4 h-4'})} {label}</h4>
+      {multiline ? (
+        <p className="text-sm bg-muted/50 p-3 rounded-md">{value}</p>
+      ) : (
+        <p className="text-sm">{value}</p>
+      )}
+    </div>
+  )
 }
 
 
@@ -184,20 +188,20 @@ function StatusTimeline({ currentStatus }: { currentStatus: ReportStatus }) {
 
   return (
     <div>
-      <h3 className="font-semibold mb-4 text-sm">Progress Timeline</h3>
+      <h3 className="font-semibold mb-4 text-sm text-blue-800">Progress Timeline</h3>
       <div className="flex justify-between items-center">
         {statusSteps.map((status, index) => (
           <React.Fragment key={status}>
             <div className="flex flex-col items-center text-center w-24">
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300",
-                index <= currentIndex ? 'bg-primary border-primary text-primary-foreground' : 'bg-muted border-muted-foreground/20 text-muted-foreground'
+                index <= currentIndex ? 'bg-green-600 border-green-600 text-white' : 'bg-muted border-muted-foreground/20 text-muted-foreground'
               )}>
-                {React.cloneElement(statusIcons[status] as React.ReactElement, { className: 'w-5 h-5'})}
+                {React.cloneElement(statusInfo[status].icon as React.ReactElement, { className: 'w-5 h-5'})}
               </div>
               <p className={cn("text-xs mt-2", index <= currentIndex ? 'font-semibold text-foreground' : 'text-muted-foreground')}>{status}</p>
             </div>
-            {index < statusSteps.length - 1 && <div className={cn("flex-1 h-1 mx-2 transition-colors duration-300", index < currentIndex ? 'bg-primary' : 'bg-muted-foreground/20')} />}
+            {index < statusSteps.length - 1 && <div className={cn("flex-1 h-1 mx-2 transition-colors duration-300", index < currentIndex ? 'bg-green-600' : 'bg-muted-foreground/20')} />}
           </React.Fragment>
         ))}
       </div>

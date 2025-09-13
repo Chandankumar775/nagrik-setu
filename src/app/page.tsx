@@ -30,7 +30,7 @@ export default function Home() {
                   <FeatureCard icon={FileWarning} title="Get Updates" description="Track the status of your report with a unique ID." />
                 </div>
               </div>
-              <Card className="shadow-lg">
+              <Card className="shadow-lg" id="report-form">
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl text-primary">Report an Issue</CardTitle>
                   <CardDescription>Fill out the form below to submit a civic issue. No account required.</CardDescription>
