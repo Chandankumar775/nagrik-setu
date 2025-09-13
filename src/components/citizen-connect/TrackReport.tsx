@@ -12,6 +12,7 @@ import { getReportByTrackingId } from '@/app/actions';
 import type { Report, ReportStatus } from '@/lib/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import React from 'react';
 
 const statusSteps: ReportStatus[] = ['Submitted', 'Acknowledged', 'In Progress', 'Resolved'];
 
@@ -47,7 +48,7 @@ export function TrackReport() {
           window.history.pushState({}, '', `/track?id=${trackingId}`);
         } else {
           setReport(null);
-          setError(`No report found with ID: ${trackingId}`);
+          setError(`An error occurred while fetching the report.`);
         }
       } catch (e) {
           setReport(null);
@@ -90,7 +91,7 @@ export function TrackReport() {
       {error && !isPending && (
         <Alert variant="destructive">
           <ServerCrash className="h-4 w-4" />
-          <AlertTitle>Not Found</AlertTitle>
+          <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { addReport, getReportByTrackingId as getReport, getReports as getAllReports } from '@/lib/data';
+import { addReport, getReportByTrackingId as getReport, getReports as getAllReports, getRandomReportData } from '@/lib/data';
 import { intelligentReportCategorization } from '@/ai/flows/intelligent-report-categorization';
 import type { Report, ReportCategory } from '@/lib/types';
 
@@ -107,7 +107,13 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
 export async function getReportByTrackingId(trackingId: string): Promise<Report | null> {
     if (!trackingId) return null;
     const report = await getReport(trackingId);
-    return report || null;
+    
+    // If a report isn't found, generate a random one for prototype purposes
+    if (!report) {
+        return getRandomReportData(trackingId);
+    }
+    
+    return report;
 }
 
 export async function getReports() {
