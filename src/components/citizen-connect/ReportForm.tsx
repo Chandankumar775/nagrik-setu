@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useState, useTransition, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -43,7 +43,7 @@ export function ReportForm() {
   const [showResultDialog, setShowResultDialog] = useState(false);
 
   const initialState: FormState = { message: '', errors: {} };
-  const [state, dispatch] = useFormState(submitReport, initialState);
+  const [state, dispatch] = useActionState(submitReport, initialState);
   
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(ReportFormSchema),
