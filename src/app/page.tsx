@@ -25,7 +25,7 @@ export default function Home() {
                             Citizen Connect makes it easy to report issues and track their resolution.
                         </p>
                     </div>
-                    <div className="relative hidden md:block">
+                    <div className="relative hidden md:block bg-white rounded-lg">
                         <Image 
                             src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/6e83ebc4-af9a-45f4-a86f-60ae20c9c734.png"
                             alt="People working together to improve their community"
