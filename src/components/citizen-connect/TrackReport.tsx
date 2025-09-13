@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle, Image as ImageIcon } from 'lucide-react';
+import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle, Image as ImageIcon, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,9 +119,15 @@ export function TrackReport() {
             
             <div className='grid md:grid-cols-2 gap-6'>
                 <div className="grid gap-4">
-                  <div className="grid gap-1">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground"><Tag className="w-4 h-4" /> Category</div>
-                      <p>{report.category}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-1">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground"><Tag className="w-4 h-4" /> Category</div>
+                        <p>{report.category}</p>
+                    </div>
+                    <div className="grid gap-1">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground"><User className="w-4 h-4" /> Submitted By</div>
+                        <p>{report.submittedBy || 'Anonymous'}</p>
+                    </div>
                   </div>
                    <div className="grid gap-1">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="w-4 h-4" /> Location</div>
@@ -135,8 +141,12 @@ export function TrackReport() {
 
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground"><ImageIcon className="w-4 h-4" /> Photo Evidence</div>
-                    {report.photoUrl && (
+                    {report.photoUrl ? (
                       <Image src={report.photoUrl} alt="Report photo" width={400} height={300} className="rounded-lg border object-cover w-full aspect-[4/3]" data-ai-hint="pothole road" />
+                    ) : (
+                      <div className="w-full aspect-[4/3] bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm">
+                        No photo provided
+                      </div>
                     )}
                 </div>
             </div>
