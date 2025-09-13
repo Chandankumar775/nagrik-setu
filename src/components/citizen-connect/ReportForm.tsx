@@ -3,7 +3,7 @@
 import { useEffect, useState, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage } from 'lucide-react';
+import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, Mic } from 'lucide-react';
 import { submitReport, type FormState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -114,6 +114,12 @@ export function ReportForm() {
                   </FormItem>
                 )}
               />
+              <Button type="button" variant="outline" className="h-auto" onClick={() => toast({ title: 'Feature not implemented', description: 'This is a placeholder for voice recording.'})}>
+                  <div className="flex items-center gap-2">
+                    <Mic className="w-4 h-4 text-muted-foreground" />
+                    <span>Voice Note (Optional)</span>
+                  </div>
+              </Button>
             </div>
           </div>
           
