@@ -157,7 +157,6 @@ export const addReport = async (reportData: Omit<Report, 'id' | 'submittedAt' | 
         status: 'Submitted',
         submittedAt: now,
         updatedAt: now,
-        submittedBy: 'Anonymous', // New reports are anonymous for now
     };
     reports.unshift(newReport); // Add to the beginning of the array
     return newReport;

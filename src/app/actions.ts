@@ -27,7 +27,7 @@ export type FormState = {
 async function getAddressFromCoordinates(lat: number, lng: number): Promise<string> {
   // In a real app, you'd use a service like Google Maps Geocoding API.
   // For now, we return a mock address.
-  return new Promise(resolve => setTimeout(() => resolve(`Vicinity of ${lat.toFixed(4)}, ${lng.toFixed(4)}`), 100));
+  return new Promise(resolve => setTimeout(() => resolve(`Ranchi, Jharkhand`), 100));
 }
 
 export async function submitReport(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -43,10 +43,8 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
     // 1. Get address from coordinates
     const address = await getAddressFromCoordinates(lat, lng);
 
-    // In a real app, you would handle file uploads to a cloud storage (e.g., S3, Firebase Storage)
-    // and get back a URL. For this prototype, we'll use a placeholder URL from picsum.
-    const photo = formData.get('photo') as File;
-    const photoUrl = photo && photo.size > 0 ? `https://picsum.photos/seed/${Date.now()}/400/300` : `https://picsum.photos/seed/mock-report/400/300`;
+    // Use the specific image provided by the user for the mock report
+    const photoUrl = 'https://assets.zeezest.com/blogs/PROD_india_villages_travel_1651054984192.jpg';
 
     // 2. Generate tracking ID
     const trackingId = `CC-${String(Date.now()).slice(-6)}`;
@@ -60,6 +58,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
       address,
       photoUrl,
       isUrgent: false, // Mock urgency
+      submittedBy: 'Rajesh Kumar', // Mock submitter name
     });
     
     // 4. Revalidate admin path to show new report
