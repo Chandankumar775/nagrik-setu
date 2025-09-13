@@ -22,7 +22,7 @@ export default function Home() {
                         </h1>
                         <p className="max-w-[600px] text-muted-foreground md:text-xl">
                             Spotted a pothole, broken streetlight, or overflowing trash? Let us know. 
-                            Citizen Connect makes it easy to report issues and track their resolution.
+                            Urban Dons makes it easy to report issues and track their resolution.
                         </p>
                     </div>
                     <div className="relative hidden md:block bg-white rounded-lg">
@@ -45,7 +45,7 @@ export default function Home() {
               <Card className="shadow-lg" id="report-form">
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl text-primary">Report an Issue</CardTitle>
-                  <CardDescription>Fill out the form below to submit a civic issue. No account required.</CardDescription>
+                  <CardDescription>Fill out the form below or use your voice to submit a civic issue. No account required.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ReportForm />
