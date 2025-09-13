@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState, useActionState, useRef } from 'react';
+import { useEffect, useState, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, Mic, Square } from 'lucide-react';
+import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage } from 'lucide-react';
 import { submitReport, type FormState } from '@/app/actions';
-import { transcribeAudio } from '@/ai/flows/speech-to-text';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -33,10 +32,6 @@ export function ReportForm() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
   
-  const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
 
   const initialState: FormState = { message: '', errors: {} };
@@ -51,7 +46,7 @@ export function ReportForm() {
     },
   });
 
-  const { setValue, clearErrors } = form;
+  const { setValue } = form;
 
   useEffect(() => {
     if (state.message) {
@@ -85,70 +80,6 @@ export function ReportForm() {
     );
   };
   
-    const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-      mediaRecorderRef.current.onstop = handleTranscribe;
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      audioChunksRef.current = [];
-    } catch (error) {
-      console.error("Microphone access denied:", error);
-      toast({
-          variant: 'destructive',
-          title: 'Microphone Access Denied',
-          description: 'Please enable microphone permissions in your browser settings to use this feature.',
-        });
-    }
-  };
-
-  const handleStopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setIsTranscribing(true);
-    }
-  };
-
-  const handleTranscribe = async () => {
-    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-    const reader = new FileReader();
-    reader.readAsDataURL(audioBlob);
-    reader.onloadend = async () => {
-      const base64Audio = reader.result as string;
-      try {
-        const result = await transcribeAudio({ audioDataUri: base64Audio });
-        if (result.transcript) {
-          setValue('description', result.transcript);
-          clearErrors("description");
-        } else {
-            toast({
-              variant: 'destructive',
-              title: 'Transcription Failed',
-              description: 'Could not transcribe audio. Please try again.',
-            });
-        }
-      } catch (error) {
-        console.error("Transcription error:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Transcription Error',
-          description: 'An unexpected error occurred during transcription.',
-        });
-      } finally {
-        setIsTranscribing(false);
-        audioChunksRef.current = [];
-        if(mediaRecorderRef.current?.stream) {
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-        }
-      }
-    };
-  };
-
   return (
     <>
       <Form {...form}>
@@ -160,7 +91,7 @@ export function ReportForm() {
               <FormItem>
                 <FormLabel>Issue Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Describe the issue or use the voice recorder below." {...field} />
+                  <Textarea placeholder="Describe the issue you're facing." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -183,12 +114,6 @@ export function ReportForm() {
                   </FormItem>
                 )}
               />
-              <div className="space-y-2">
-                  <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={isRecording ? handleStopRecording : handleStartRecording} disabled={isTranscribing}>
-                      {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : isRecording ? <Square className="w-4 h-4 text-destructive" /> : <Mic className="w-4 h-4 text-muted-foreground" />}
-                      {isTranscribing ? 'Transcribing...' : isRecording ? 'Stop Recording' : 'Record Voice Note'}
-                  </Button>
-              </div>
             </div>
           </div>
           
