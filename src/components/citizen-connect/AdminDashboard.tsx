@@ -2,17 +2,20 @@
 
 import { useState, useMemo } from 'react';
 import type { Report, ReportStatus, ReportCategory } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ListFilter, AlertCircle, Clock, CheckCircle2, Hourglass, Wrench } from 'lucide-react';
+import { ListFilter, AlertCircle, Clock, CheckCircle2, Hourglass, Wrench, BarChartHorizontal, PieChart, ShieldAlert } from 'lucide-react';
 import { ReportMap } from './ReportMap';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import Image from 'next/image';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, startOfWeek, endOfWeek } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
+import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer, Pie, Cell } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+
 
 const statusColors: Record<ReportStatus, string> = {
     Submitted: 'border-blue-500/50 text-blue-500',
@@ -36,10 +39,16 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
     const [statusFilter, setStatusFilter] = useState<ReportStatus[]>([]);
     const [categoryFilter, setCategoryFilter] = useState<ReportCategory[]>([]);
     
-    const statusCounts = useMemo(() => reports.reduce((acc, report) => {
-        acc[report.status] = (acc[report.status] || 0) + 1;
-        return acc;
-    }, {} as Record<ReportStatus, number>), [reports]);
+    const { statusCounts, urgentReportsCount } = useMemo(() => {
+        const counts = reports.reduce((acc, report) => {
+            acc.statusCounts[report.status] = (acc.statusCounts[report.status] || 0) + 1;
+            if (report.isUrgent) {
+                acc.urgentReportsCount++;
+            }
+            return acc;
+        }, { statusCounts: {} as Record<ReportStatus, number>, urgentReportsCount: 0 });
+        return counts;
+    }, [reports]);
     
     const filteredReports = useMemo(() => {
         return reports.filter(report => {
@@ -51,14 +60,101 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
     
     const uniqueCategories = [...new Set(reports.map(r => r.category))] as ReportCategory[];
     const uniqueStatuses = ['Submitted', 'Acknowledged', 'In Progress', 'Resolved', 'Rejected'] as ReportStatus[];
+    
+    const reportsThisWeek = useMemo(() => {
+        const now = new Date();
+        const weekStart = startOfWeek(now);
+        const weekEnd = endOfWeek(now);
+        return reports.filter(r => new Date(r.submittedAt) >= weekStart && new Date(r.submittedAt) <= weekEnd).length;
+    }, [reports]);
+
+    const averageResolutionTime = useMemo(() => {
+        const resolvedReports = reports.filter(r => r.status === 'Resolved');
+        if (resolvedReports.length === 0) return 'N/A';
+        const totalTime = resolvedReports.reduce((acc, r) => {
+            return acc + (new Date(r.updatedAt).getTime() - new Date(r.submittedAt).getTime());
+        }, 0);
+        const avgMilliseconds = totalTime / resolvedReports.length;
+        const avgDays = avgMilliseconds / (1000 * 60 * 60 * 24);
+        return `${avgDays.toFixed(1)} days`;
+    }, [reports]);
+    
+    const categoryDistribution = useMemo(() => {
+        const dist = reports.reduce((acc, report) => {
+            acc[report.category] = (acc[report.category] || 0) + 1;
+            return acc;
+        }, {} as Record<ReportCategory, number>);
+        
+        return Object.entries(dist).map(([name, value]) => ({ name, value, fill: `hsl(var(--chart-${Object.keys(dist).indexOf(name) + 1}))` }));
+    }, [reports]);
+    
+    const reportsByDay = useMemo(() => {
+        const dist = reports.reduce((acc, report) => {
+            const day = format(new Date(report.submittedAt), 'EEE');
+            acc[day] = (acc[day] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return days.map(day => ({ day, count: dist[day] || 0 }));
+    }, [reports]);
 
     return (
         <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Total Reports" value={reports.length} icon={<ListFilter />} />
-                <StatCard title="In Progress" value={statusCounts['In Progress'] || 0} icon={<Hourglass />} />
-                <StatCard title="Resolved" value={statusCounts['Resolved'] || 0} icon={<CheckCircle2 />} />
-                <StatCard title="Pending" value={(statusCounts['Submitted'] || 0) + (statusCounts['Acknowledged'] || 0)} icon={<Clock />} />
+                <StatCard title="Urgent High-Priority" value={urgentReportsCount} icon={<ShieldAlert />} />
+                <StatCard title="Resolved This Week" value={statusCounts['Resolved'] || 0} icon={<CheckCircle2 />} />
+                <StatCard title="Average Resolution Time" value={averageResolutionTime} icon={<Clock />} />
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className='font-headline text-lg'>Reports by Category</CardTitle>
+                        <CardDescription>Distribution of all submitted reports.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartContainer config={{}} className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                                    <Pie data={categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                        const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
+                                        const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                                        const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                                        return (
+                                          <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
+                                            {`${(percent * 100).toFixed(0)}%`}
+                                          </text>
+                                        );
+                                      }}>
+                                      {categoryDistribution.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                                      ))}
+                                    </Pie>
+                                    <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className='font-headline text-lg'>Weekly Report Volume</CardTitle>
+                        <CardDescription>Number of new reports submitted each day this week.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <ChartContainer config={{ count: { label: 'Reports', color: 'hsl(var(--primary))' } }} className="h-64 w-full">
+                            <BarChart accessibilityLayer data={reportsByDay} margin={{ top: 20, right: 20, bottom: 0, left: -20 }}>
+                                <CartesianGrid vertical={false} />
+                                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Bar dataKey="count" fill="hsl(var(--primary))" radius={4} />
+                            </BarChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -113,6 +209,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
                                 {filteredReports.map(report => (
                                     <TableRow key={report.id} onClick={() => setSelectedReport(report)} className="cursor-pointer">
                                         <TableCell className="font-medium flex items-center gap-2">
+                                            {report.isUrgent && <ShieldAlert className="w-4 h-4 text-destructive" titleAccess='Urgent' />}
                                             {categoryIcons[report.category] || categoryIcons['Other']}
                                             {report.category}
                                         </TableCell>
@@ -141,7 +238,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
     );
 }
 
-function StatCard({ title, value, icon }: { title: string, value: number, icon: React.ReactNode }) {
+function StatCard({ title, value, icon }: { title: string, value: number | string, icon: React.ReactNode }) {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -163,7 +260,10 @@ function ReportDetailsSheet({ report, onOpenChange }: { report: Report | null, o
                 {report && (
                     <>
                     <SheetHeader>
-                        <SheetTitle className="font-headline text-2xl">{report.category}</SheetTitle>
+                        <SheetTitle className="font-headline text-2xl flex items-center gap-2">
+                            {report.isUrgent && <ShieldAlert className="w-6 h-6 text-destructive" titleAccess='Urgent' />}
+                            {report.category}
+                        </SheetTitle>
                         <SheetDescription>Details for report <span className="font-mono">{report.trackingId}</span></SheetDescription>
                     </SheetHeader>
                     <div className="space-y-6 py-6">

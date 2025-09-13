@@ -22,6 +22,10 @@ function DashboardSkeleton() {
                 <Skeleton className="h-28" />
                 <Skeleton className="h-28" />
             </div>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+                <Skeleton className="h-80" />
+                <Skeleton className="h-80" />
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                 <Skeleton className="h-[500px] lg:col-span-3" />
                 <Skeleton className="h-[300px] lg:h-[500px] lg:col-span-2" />

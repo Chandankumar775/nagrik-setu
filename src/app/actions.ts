@@ -57,11 +57,12 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
   }
 
   try {
-    // 1. Get AI-based category
+    // 1. Get AI-based category and urgency
     const categorizationResult = await intelligentReportCategorization({
       reportDescription: description,
     });
     const category = categorizationResult.category as ReportCategory;
+    const isUrgent = categorizationResult.isUrgent;
 
     // 2. Get address from coordinates
     const address = await getAddressFromCoordinates(lat, lng);
@@ -82,6 +83,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
       location: { lat, lng },
       address,
       photoUrl,
+      isUrgent,
     });
     
     // 5. Revalidate admin path to show new report

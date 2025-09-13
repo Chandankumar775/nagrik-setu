@@ -17,4 +17,5 @@ export interface Report {
   status: ReportStatus;
   submittedAt: Date;
   updatedAt: Date;
+  isUrgent: boolean;
 }
