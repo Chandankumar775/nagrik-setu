@@ -3,8 +3,6 @@
 import { useEffect, useState, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, MicVocal } from 'lucide-react';
 import { submitReport, type FormState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -16,15 +14,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
 import { Card, CardContent } from '../ui/card';
 
-const ReportFormSchema = z.object({
-  description: z.string().min(10, 'Please provide a detailed description (min. 10 characters).').max(500),
-  photo: z.any().optional(),
-  voice: z.any().optional(),
-  latitude: z.string().min(1, 'Location is required. Please click "Get Current Location".'),
-  longitude: z.string().min(1, 'Location is required. Please click "Get Current Location".'),
-});
-
-type ReportFormValues = z.infer<typeof ReportFormSchema>;
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -45,8 +34,7 @@ export function ReportForm() {
   const initialState: FormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(submitReport, initialState);
   
-  const form = useForm<ReportFormValues>({
-    resolver: zodResolver(ReportFormSchema),
+  const form = useForm({
     defaultValues: {
       description: '',
       photo: undefined,
@@ -56,7 +44,7 @@ export function ReportForm() {
     },
   });
 
-  const { setValue, trigger } = form;
+  const { setValue } = form;
 
   useEffect(() => {
     if (state.message) {
@@ -79,8 +67,8 @@ export function ReportForm() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setValue('latitude', position.coords.latitude.toString(), { shouldValidate: true });
-        setValue('longitude', position.coords.longitude.toString(), { shouldValidate: true });
+        setValue('latitude', position.coords.latitude.toString());
+        setValue('longitude', position.coords.longitude.toString());
         setLocationStatus('success');
       },
       (error) => {
