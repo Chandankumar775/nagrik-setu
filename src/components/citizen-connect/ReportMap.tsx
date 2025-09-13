@@ -16,7 +16,7 @@ export function ReportMap({ reports }: { reports: Report[] }) {
   return (
     <div className="relative aspect-video w-full rounded-lg overflow-hidden border">
       <Image
-        src={`https://picsum.photos/seed/${mapSeed}/800/600`}
+        src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/9c066cf0-9e54-4143-883f-78424578dc70.png"
         alt="Map of reported issues"
         fill
         className="object-cover"

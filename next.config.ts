@@ -59,18 +59,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
-        hostname: 'resize.indiatvnews.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'akm-img-a-in.tosshub.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
         protocol: 'https' ,
         hostname: 'www.reuters.com',
         port: '',
@@ -81,7 +69,13 @@ const nextConfig: NextConfig = {
         hostname: 'static.toiimg.com',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'user-gen-media-assets.s3.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
