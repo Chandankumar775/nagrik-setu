@@ -8,7 +8,9 @@ export function Header() {
     <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-40">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-3">
-            <Image src="https://i.postimg.cc/zBZXPtFF/Jharkhand-Rajakiya-Chihna-svg.webp" alt="Jharkhand Government Logo" width={48} height={48} />
+            <div className="bg-white rounded-full p-1">
+              <Image src="https://i.postimg.cc/zBZXPtFF/Jharkhand-Rajakiya-Chihna-svg.webp" alt="Jharkhand Government Logo" width={48} height={48} />
+            </div>
            <div>
             <span className="font-headline text-xl font-bold tracking-tight text-primary">
                 Urban Dons
