@@ -26,15 +26,15 @@ export function Header() {
           </span>
         </Link>
         <nav className="flex items-center gap-2">
-            <Link href="/track">
-                <Button variant="ghost">Track Report</Button>
-            </Link>
-            <Link href="/admin">
-                <Button variant="outline">
+            <Button variant="ghost" asChild>
+                <Link href="/track">Track Report</Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/admin">
                     <Shield className="mr-2 h-4 w-4" />
                     Admin Panel
-                </Button>
-            </Link>
+                </Link>
+            </Button>
         </nav>
       </div>
     </header>
