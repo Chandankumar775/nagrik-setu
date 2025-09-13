@@ -111,7 +111,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle className='font-headline text-lg'>Reports by Category</CardTitle>
+                        <CardTitle className='font-headline text-lg text-primary'>Reports by Category</CardTitle>
                         <CardDescription>Distribution of all submitted reports.</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -141,16 +141,16 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
                 </Card>
                  <Card>
                     <CardHeader>
-                        <CardTitle className='font-headline text-lg'>Weekly Report Volume</CardTitle>
+                        <CardTitle className='font-headline text-lg text-primary'>Weekly Report Volume</CardTitle>
                         <CardDescription>Number of new reports submitted each day this week.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                         <ChartContainer config={{ count: { label: 'Reports', color: 'hsl(var(--primary))' } }} className="h-64 w-full">
+                         <ChartContainer config={{ count: { label: 'Reports', color: 'hsl(var(--accent))' } }} className="h-64 w-full">
                             <BarChart accessibilityLayer data={reportsByDay} margin={{ top: 20, right: 20, bottom: 0, left: -20 }}>
                                 <CartesianGrid vertical={false} />
                                 <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar dataKey="count" fill="hsl(var(--primary))" radius={4} />
+                                <Bar dataKey="count" fill="hsl(var(--accent))" radius={4} />
                             </BarChart>
                         </ChartContainer>
                     </CardContent>
@@ -160,7 +160,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                 <Card className="lg:col-span-3">
                     <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="font-headline">Recent Reports</CardTitle>
+                        <CardTitle className="font-headline text-primary">Recent Reports</CardTitle>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="ml-auto gap-1">
@@ -225,7 +225,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
                 </Card>
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle className="font-headline">Issue Map</CardTitle>
+                        <CardTitle className="font-headline text-primary">Issue Map</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ReportMap reports={filteredReports} />
@@ -260,7 +260,7 @@ function ReportDetailsSheet({ report, onOpenChange }: { report: Report | null, o
                 {report && (
                     <>
                     <SheetHeader>
-                        <SheetTitle className="font-headline text-2xl flex items-center gap-2">
+                        <SheetTitle className="font-headline text-2xl flex items-center gap-2 text-primary">
                             {report.isUrgent && <ShieldAlert className="w-6 h-6 text-destructive" titleAccess='Urgent' />}
                             {report.category}
                         </SheetTitle>
@@ -296,7 +296,7 @@ function ReportDetailsSheet({ report, onOpenChange }: { report: Report | null, o
                     </div>
                      <SheetFooter className="mt-auto pt-6">
                         <div className="flex gap-2 w-full">
-                            <Button size="sm" className="flex-1">Assign Department</Button>
+                            <Button size="sm" className="flex-1" variant="accent">Assign Department</Button>
                             <Button size="sm" variant="outline" className="flex-1">Update Status</Button>
                         </div>
                      </SheetFooter>

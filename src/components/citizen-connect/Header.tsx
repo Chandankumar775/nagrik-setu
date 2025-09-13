@@ -6,21 +6,22 @@ export function Header() {
   return (
     <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-40">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-7 w-7 text-primary"
-          >
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-          <span className="font-headline text-xl font-bold tracking-tight text-foreground">
+        <Link href="/" className="flex items-center gap-3">
+           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="M12 10a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path>
+                <path d="M12 12.5c-4.42 0-8 1.79-8 4v.5"></path>
+                <path d="M20 16.5c-4.42 0-8-1.79-8-4"></path>
+                <path d="M12 2.5v2.5"></path>
+                <path d="M12 10v2.5"></path>
+                <path d="M16.5 4.75l-2.5 1.5"></path>
+                <path d="M7.5 6.25l2.5-1.5"></path>
+                <path d="m19.5 9-2.5 1.5"></path>
+                <path d="m4.5 10.5 2.5-1.5"></path>
+                <path d="M18.5 14.25-16 12"></path>
+                <path d="m5.5 14.25 2.5-1.5"></path>
+           </svg>
+          <span className="font-headline text-xl font-bold tracking-tight text-primary">
             Citizen Connect
           </span>
         </Link>

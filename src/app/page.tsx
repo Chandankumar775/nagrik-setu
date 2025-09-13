@@ -13,7 +13,7 @@ export default function Home() {
             <div className="grid gap-6 lg:grid-cols-[1fr_550px] lg:gap-12 xl:grid-cols-[1fr_650px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
-                  <h1 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                  <h1 className="font-headline text-3xl font-bold tracking-tighter text-primary sm:text-4xl md:text-5xl lg:text-6xl/none">
                     Report a Civic Issue,
                     <br />
                     Improve Your Community
@@ -30,9 +30,9 @@ export default function Home() {
                   <FeatureCard icon={FileWarning} title="Get Updates" description="Track the status of your report with a unique ID." />
                 </div>
               </div>
-              <Card className="shadow-2xl">
+              <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Report an Issue</CardTitle>
+                  <CardTitle className="font-headline text-2xl text-primary">Report an Issue</CardTitle>
                   <CardDescription>Fill out the form below to submit a civic issue. No account required.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -50,7 +50,7 @@ export default function Home() {
 function FeatureCard({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) {
     return (
         <div className="flex items-start gap-4 rounded-lg p-2 transition-colors hover:bg-card">
-            <Icon className="mt-1 h-6 w-6 text-primary" />
+            <Icon className="mt-1 h-6 w-6 text-accent" />
             <div>
                 <h3 className="font-semibold">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>

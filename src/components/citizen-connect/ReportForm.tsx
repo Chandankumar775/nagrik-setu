@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition, useActionState } from 'react';
+import { useEffect, useState, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,7 +29,7 @@ type ReportFormValues = z.infer<typeof ReportFormSchema>;
 function SubmitButton() {
     const { pending } = useFormStatus();
     return (
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="w-full" disabled={pending} variant="accent">
             {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Submit Report
         </Button>
@@ -197,7 +197,7 @@ export function ReportForm() {
                     <Card className="bg-muted/50">
                         <CardContent className="p-4">
                             <p className="text-sm text-muted-foreground">Your Tracking ID</p>
-                            <p className="text-lg font-mono font-bold text-primary">{state.report?.trackingId}</p>
+                            <p className="text-lg font-mono font-bold text-accent">{state.report?.trackingId}</p>
                         </CardContent>
                     </Card>
                     <Link href={`/track?id=${state.report?.trackingId}`} passHref>
