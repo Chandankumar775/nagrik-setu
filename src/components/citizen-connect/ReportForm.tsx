@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useActionState } from 'react';
+import { useEffect, useState, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, MicVocal } from 'lucide-react';
+import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, Mic, Square } from 'lucide-react';
 import { submitReport, type FormState } from '@/app/actions';
+import { transcribeAudio } from '@/ai/flows/speech-to-text';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
 import { Card, CardContent } from '../ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 
 function SubmitButton() {
@@ -30,6 +32,12 @@ export function ReportForm() {
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [locationError, setLocationError] = useState<string | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
+  
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const { toast } = useToast();
 
   const initialState: FormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(submitReport, initialState);
@@ -38,13 +46,12 @@ export function ReportForm() {
     defaultValues: {
       description: '',
       photo: undefined,
-      voice: undefined,
       latitude: '',
       longitude: '',
     },
   });
 
-  const { setValue } = form;
+  const { setValue, clearErrors } = form;
 
   useEffect(() => {
     if (state.message) {
@@ -77,6 +84,70 @@ export function ReportForm() {
       }
     );
   };
+  
+    const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.onstop = handleTranscribe;
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      audioChunksRef.current = [];
+    } catch (error) {
+      console.error("Microphone access denied:", error);
+      toast({
+          variant: 'destructive',
+          title: 'Microphone Access Denied',
+          description: 'Please enable microphone permissions in your browser settings to use this feature.',
+        });
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsTranscribing(true);
+    }
+  };
+
+  const handleTranscribe = async () => {
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+    reader.onloadend = async () => {
+      const base64Audio = reader.result as string;
+      try {
+        const result = await transcribeAudio({ audioDataUri: base64Audio });
+        if (result.transcript) {
+          setValue('description', result.transcript);
+          clearErrors("description");
+        } else {
+            toast({
+              variant: 'destructive',
+              title: 'Transcription Failed',
+              description: 'Could not transcribe audio. Please try again.',
+            });
+        }
+      } catch (error) {
+        console.error("Transcription error:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Transcription Error',
+          description: 'An unexpected error occurred during transcription.',
+        });
+      } finally {
+        setIsTranscribing(false);
+        audioChunksRef.current = [];
+        if(mediaRecorderRef.current?.stream) {
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    };
+  };
 
   return (
     <>
@@ -89,41 +160,38 @@ export function ReportForm() {
               <FormItem>
                 <FormLabel>Issue Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="e.g., There's a large pothole at the corner of Main St and 1st Ave." {...field} />
+                  <Textarea placeholder="Describe the issue or use the voice recorder below." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+          <div className="space-y-2">
+            <FormLabel>Attachments</FormLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <FormField
                 control={form.control}
                 name="photo"
                 render={() => (
                   <FormItem>
-                    <FormLabel className="flex items-center gap-2"><FileImage className="w-4 h-4"/>Photo (Optional)</FormLabel>
+                    <FormLabel className="font-normal flex items-center gap-2 cursor-pointer border rounded-md p-2 hover:bg-muted transition-colors"><FileImage className="w-4 h-4 text-muted-foreground"/>Photo (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="file" accept="image/*" {...form.register('photo')} />
+                      <Input type="file" accept="image/*" {...form.register('photo')} className="sr-only" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="voice"
-                render={() => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2"><MicVocal className="w-4 h-4"/>Voice Note (Optional)</FormLabel>
-                    <FormControl>
-                      <Input type="file" accept="audio/*" {...form.register('voice')} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                  <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={isRecording ? handleStopRecording : handleStartRecording} disabled={isTranscribing}>
+                      {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : isRecording ? <Square className="w-4 h-4 text-destructive" /> : <Mic className="w-4 h-4 text-muted-foreground" />}
+                      {isTranscribing ? 'Transcribing...' : isRecording ? 'Stop Recording' : 'Record Voice Note'}
+                  </Button>
+              </div>
+            </div>
           </div>
+          
 
           <FormField
             control={form.control}
