@@ -6,7 +6,7 @@ let reports: Report[] = [];
 // A specific set of 10 mock reports for predictable demoing
 const mockReports: Report[] = [
     // 1 (Resolved)
-    { id: 'rep-mock-1', trackingId: 'CC-MOCK-1', category: 'Pothole', description: 'Large pothole in front of the local market in Mumbai, causing severe traffic disruption.', location: { lat: 19.0760, lng: 72.8777 }, address: 'Near Dadar Market, Mumbai, Maharashtra', status: 'Resolved', isUrgent: false, photoUrl: 'https://picsum.photos/seed/mock1/400/300', submittedAt: new Date('2024-07-10T09:00:00Z'), updatedAt: new Date('2024-07-15T14:30:00Z') },
+    { id: 'rep-mock-1', trackingId: 'CC-MOCK-1', category: 'Pothole', description: 'Large pothole in front of the local market in Mumbai, causing severe traffic disruption.', location: { lat: 19.0760, lng: 72.8777 }, address: 'Near Dadar Market, Mumbai, Maharashtra', status: 'Resolved', isUrgent: false, photoUrl: 'https://d3i6fh83elv35t.cloudfront.net/static/2020/05/2020-05-21T100018Z_383787307_RC2WSG9NQ3MW_RTRMADP_3_ASIA-STORM-INDIA-1024x696.jpg', submittedAt: new Date('2024-07-10T09:00:00Z'), updatedAt: new Date('2024-07-15T14:30:00Z') },
     // 2 (In Progress)
     { id: 'rep-mock-2', trackingId: 'CC-MOCK-2', category: 'Broken Streetlight', description: 'Streetlight on corner of Park Street is out, area is very dark and unsafe at night.', location: { lat: 22.5596, lng: 88.3541 }, address: 'Park Street, Kolkata, West Bengal', status: 'In Progress', isUrgent: true, photoUrl: 'https://picsum.photos/seed/mock2/400/300', submittedAt: new Date('2024-07-18T22:15:00Z'), updatedAt: new Date('2024-07-19T11:00:00Z') },
     // 3 (Acknowledged)
