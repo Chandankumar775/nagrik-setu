@@ -11,7 +11,7 @@ export function Header() {
             <Image src="https://i.postimg.cc/zBZXPtFF/Jharkhand-Rajakiya-Chihna-svg.webp" alt="Jharkhand Government Logo" width={48} height={48} />
            <div>
             <span className="font-headline text-xl font-bold tracking-tight text-primary">
-                Jharkhand Citizen Connect
+                Urban Dons
             </span>
              <p className="text-xs text-muted-foreground font-semibold">An Initiative by Government of Jharkhand</p>
            </div>
