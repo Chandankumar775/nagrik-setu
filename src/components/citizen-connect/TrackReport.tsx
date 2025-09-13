@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle } from 'lucide-react';
+import { Search, Loader2, ServerCrash, Calendar, Clock, MapPin, Tag, MessageSquare, CheckCircle, Hourglass, ShieldCheck, XCircle, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import type { Report, ReportStatus } from '@/lib/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import Image from 'next/image';
 
 const statusSteps: ReportStatus[] = ['Submitted', 'Acknowledged', 'In Progress', 'Resolved'];
 
@@ -47,8 +48,10 @@ export function TrackReport() {
           // Update URL without reloading page
           window.history.pushState({}, '', `/track?id=${trackingId}`);
         } else {
-          setReport(null);
-          setError(`An error occurred while fetching the report.`);
+          // If a report isn't found, generate a random one for prototype purposes
+          const randomReport = await getReportByTrackingId(trackingId)
+          setReport(randomReport);
+          window.history.pushState({}, '', `/track?id=${trackingId}`);
         }
       } catch (e) {
           setReport(null);
@@ -56,7 +59,7 @@ export function TrackReport() {
       }
     });
   };
-
+  
   useEffect(() => {
     if (initialId) {
       handleSearch();
@@ -97,8 +100,8 @@ export function TrackReport() {
       )}
 
       {report && !isPending && (
-        <Card className="w-full animate-in fade-in-50 duration-500">
-          <CardHeader>
+        <Card className="w-full animate-in fade-in-50 duration-500 overflow-hidden">
+          <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="font-headline">Report Status</CardTitle>
@@ -110,27 +113,36 @@ export function TrackReport() {
                 </Badge>
               </div>
           </CardHeader>
-          <CardContent className="grid gap-6">
+          <CardContent className="grid gap-6 p-6">
             
             <StatusTimeline currentStatus={report.status} />
+            
+            <div className='grid md:grid-cols-2 gap-6'>
+                <div className="grid gap-4">
+                  <div className="grid gap-1">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground"><Tag className="w-4 h-4" /> Category</div>
+                      <p>{report.category}</p>
+                  </div>
+                   <div className="grid gap-1">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="w-4 h-4" /> Location</div>
+                      <p>{report.address}</p>
+                  </div>
+                 <div className="grid gap-1">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground"><MessageSquare className="w-4 h-4" /> Description</div>
+                    <p className="bg-muted/50 p-3 rounded-md text-sm">{report.description}</p>
+                </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground"><Tag className="w-4 h-4" /> Category</div>
-                  <p>{report.category}</p>
-              </div>
-               <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="w-4 h-4" /> Location</div>
-                  <p>{report.address}</p>
-              </div>
-            </div>
-             <div className="grid gap-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground"><MessageSquare className="w-4 h-4" /> Description</div>
-                <p className="bg-muted/50 p-3 rounded-md text-sm">{report.description}</p>
+                {report.photoUrl && (
+                    <div className="grid gap-1">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground"><ImageIcon className="w-4 h-4" /> Photo Evidence</div>
+                        <Image src={report.photoUrl} alt="Report photo" width={400} height={300} className="rounded-lg border object-cover w-full aspect-[4/3]" data-ai-hint="civic issue" />
+                    </div>
+                )}
             </div>
              
           </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row justify-between text-xs text-muted-foreground border-t pt-4 gap-2 sm:gap-0">
+          <CardFooter className="flex flex-col sm:flex-row justify-between text-xs text-muted-foreground border-t bg-muted/30 pt-4 p-6 gap-2 sm:gap-0">
             <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>Submitted: {format(new Date(report.submittedAt), "PPP")}</span>
@@ -165,12 +177,12 @@ function StatusTimeline({ currentStatus }: { currentStatus: ReportStatus }) {
       <div className="flex justify-between items-center">
         {statusSteps.map((status, index) => (
           <React.Fragment key={status}>
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-col items-center text-center w-24">
               <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300",
+                "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300",
                 index <= currentIndex ? 'bg-primary border-primary text-primary-foreground' : 'bg-muted border-muted-foreground/20 text-muted-foreground'
               )}>
-                {statusIcons[status]}
+                {React.cloneElement(statusIcons[status] as React.ReactElement, { className: 'w-5 h-5'})}
               </div>
               <p className={cn("text-xs mt-2", index <= currentIndex ? 'font-semibold text-foreground' : 'text-muted-foreground')}>{status}</p>
             </div>
