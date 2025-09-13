@@ -2,6 +2,7 @@ import { Header } from '@/components/citizen-connect/Header';
 import { ReportForm } from '@/components/citizen-connect/ReportForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileWarning, MapPin, Mic, Camera } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -12,16 +13,27 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_550px] lg:gap-12 xl:grid-cols-[1fr_650px]">
               <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="font-headline text-3xl font-bold tracking-tighter text-primary sm:text-4xl md:text-5xl lg:text-6xl/none">
-                    Report a Civic Issue,
-                    <br />
-                    Improve Your Community
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Spotted a pothole, broken streetlight, or overflowing trash? Let us know. 
-                    Citizen Connect makes it easy to report issues and track their resolution.
-                  </p>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <h1 className="font-headline text-3xl font-bold tracking-tighter text-primary sm:text-4xl md:text-5xl lg:text-6xl/none">
+                            Report a Civic Issue,
+                            <br />
+                            Improve Your Community
+                        </h1>
+                        <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                            Spotted a pothole, broken streetlight, or overflowing trash? Let us know. 
+                            Citizen Connect makes it easy to report issues and track their resolution.
+                        </p>
+                    </div>
+                    <div className="relative hidden md:block">
+                        <Image 
+                            src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/6e83ebc4-af9a-45f4-a86f-60ae20c9c734.png"
+                            alt="People working together to improve their community"
+                            fill
+                            className="object-contain"
+                            data-ai-hint="community improvement"
+                        />
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                   <FeatureCard icon={Camera} title="Snap a Photo" description="A picture is worth a thousand words." />
