@@ -135,7 +135,9 @@ export function TrackReport() {
 
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground"><ImageIcon className="w-4 h-4" /> Photo Evidence</div>
-                    <Image src="https://i.postimg.cc/NjsXdMjj/images.jpg" alt="Report photo" width={400} height={300} className="rounded-lg border object-cover w-full aspect-[4/3]" data-ai-hint="pothole road" />
+                    {report.photoUrl && (
+                      <Image src={report.photoUrl} alt="Report photo" width={400} height={300} className="rounded-lg border object-cover w-full aspect-[4/3]" data-ai-hint="pothole road" />
+                    )}
                 </div>
             </div>
              
