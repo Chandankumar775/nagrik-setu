@@ -3,30 +3,35 @@ import { Report, ReportStatus, ReportCategory } from '@/lib/types';
 // In-memory store for reports
 let reports: Report[] = [];
 
+const submittedByNames = [
+    'Arjun Sharma', 'Priya Patel', 'Rohan Das', 'Anika Gupta', 'Vikram Singh',
+    'Ishaan Reddy', 'Meera Iyer', 'Sameer Khan', 'Diya Mehta', 'Kabir Joshi'
+];
+
 // A specific set of 10 mock reports for predictable demoing
 const mockReports: Report[] = [
     // 1 (Resolved)
-    { id: 'rep-mock-1', trackingId: 'CC-MOCK-1', category: 'Pothole', description: 'Large pothole in front of the local market in Mumbai, causing severe traffic disruption.', location: { lat: 19.0760, lng: 72.8777 }, address: 'Near Dadar Market, Mumbai, Maharashtra', status: 'Resolved', isUrgent: false, photoUrl: 'https://d3i6fh83elv35t.cloudfront.net/static/2020/05/2020-05-21T100018Z_383787307_RC2WSG9NQ3MW_RTRMADP_3_ASIA-STORM-INDIA-1024x696.jpg', submittedAt: new Date('2024-07-10T09:00:00Z'), updatedAt: new Date('2024-07-15T14:30:00Z') },
+    { id: 'rep-mock-1', trackingId: 'CC-MOCK-1', category: 'Pothole', description: 'Large pothole in front of the local market in Mumbai, causing severe traffic disruption.', location: { lat: 19.0760, lng: 72.8777 }, address: 'Near Dadar Market, Mumbai, Maharashtra', status: 'Resolved', isUrgent: false, photoUrl: 'https://d3i6fh83elv35t.cloudfront.net/static/2020/05/2020-05-21T100018Z_383787307_RC2WSG9NQ3MW_RTRMADP_3_ASIA-STORM-INDIA-1024x696.jpg', submittedAt: new Date('2024-07-10T09:00:00Z'), updatedAt: new Date('2024-07-15T14:30:00Z'), submittedBy: 'Priya Patel' },
     // 2 (In Progress)
-    { id: 'rep-mock-2', trackingId: 'CC-MOCK-2', category: 'Broken Streetlight', description: 'Streetlight on corner of Park Street is out, area is very dark and unsafe at night.', location: { lat: 22.5596, lng: 88.3541 }, address: 'Park Street, Kolkata, West Bengal', status: 'In Progress', isUrgent: true, photoUrl: 'https://c8.alamy.com/comp/2R6KEKN/a-family-standing-on-a-culvert-in-a-village-logged-with-rain-water-tamil-nadu-south-india-india-asia-2R6KEKN.jpg', submittedAt: new Date('2024-07-18T22:15:00Z'), updatedAt: new Date('2024-07-19T11:00:00Z') },
+    { id: 'rep-mock-2', trackingId: 'CC-MOCK-2', category: 'Broken Streetlight', description: 'Streetlight on corner of Park Street is out, area is very dark and unsafe at night.', location: { lat: 22.5596, lng: 88.3541 }, address: 'Park Street, Kolkata, West Bengal', status: 'In Progress', isUrgent: true, photoUrl: 'https://c8.alamy.com/comp/2R6KEKN/a-family-standing-on-a-culvert-in-a-village-logged-with-rain-water-tamil-nadu-south-india-india-asia-2R6KEKN.jpg', submittedAt: new Date('2024-07-18T22:15:00Z'), updatedAt: new Date('2024-07-19T11:00:00Z'), submittedBy: 'Rohan Das' },
     // 3 (Acknowledged)
-    { id: 'rep-mock-3', trackingId: 'CC-MOCK-3', category: 'Overflowing Trash Bin', description: 'Community trash bin near the temple in Varanasi has not been emptied for a week.', location: { lat: 25.3176, lng: 82.9739 }, address: 'Near Kashi Vishwanath Temple, Varanasi, Uttar Pradesh', status: 'Acknowledged', isUrgent: false, photoUrl: 'https://i.ytimg.com/vi/vDvvFg_Dvkw/hq720.jpg', submittedAt: new Date('2024-07-20T11:45:00Z'), updatedAt: new Date('2024-07-20T16:00:00Z') },
+    { id: 'rep-mock-3', trackingId: 'CC-MOCK-3', category: 'Overflowing Trash Bin', description: 'Community trash bin near the temple in Varanasi has not been emptied for a week.', location: { lat: 25.3176, lng: 82.9739 }, address: 'Near Kashi Vishwanath Temple, Varanasi, Uttar Pradesh', status: 'Acknowledged', isUrgent: false, photoUrl: 'https://i.ytimg.com/vi/vDvvFg_Dvkw/hq720.jpg', submittedAt: new Date('2024-07-20T11:45:00Z'), updatedAt: new Date('2024-07-20T16:00:00Z'), submittedBy: 'Anika Gupta' },
     // 4 (Resolved)
-    { id: 'rep-mock-4', trackingId: 'CC-MOCK-4', category: 'Water Leak', description: 'Clean water pipe is leaking heavily on the main road in Jaipur.', location: { lat: 26.9124, lng: 75.7873 }, address: 'Hawa Mahal Road, Jaipur, Rajasthan', status: 'Resolved', isUrgent: true, photoUrl: 'https://images.assettype.com/nationalherald/2024-07/8eaecba8-8f41-48a4-8940-8793e629ee8c/PTI07_30_2024_000054B.jpg', submittedAt: new Date('2024-07-12T08:00:00Z'), updatedAt: new Date('2024-07-13T17:00:00Z') },
+    { id: 'rep-mock-4', trackingId: 'CC-MOCK-4', category: 'Water Leak', description: 'Clean water pipe is leaking heavily on the main road in Jaipur.', location: { lat: 26.9124, lng: 75.7873 }, address: 'Hawa Mahal Road, Jaipur, Rajasthan', status: 'Resolved', isUrgent: true, photoUrl: 'https://images.assettype.com/nationalherald/2024-07/8eaecba8-8f41-48a4-8940-8793e629ee8c/PTI07_30_2024_000054B.jpg', submittedAt: new Date('2024-07-12T08:00:00Z'), updatedAt: new Date('2024-07-13T17:00:00Z'), submittedBy: 'Vikram Singh' },
     // 5 (Submitted)
-    { id: 'rep-mock-5', trackingId: 'CC-MOCK-5', category: 'Other', description: 'Stray dogs are causing issues in the residential area of Sector 17.', location: { lat: 30.7415, lng: 76.7766 }, address: 'Sector 17, Chandigarh', status: 'Submitted', isUrgent: false, photoUrl: 'https://resize.indiatvnews.com/en/resize/gallery/840_-/2021/12/cloudburst-in-devprayag-1-1640797324.jpg', submittedAt: new Date(), updatedAt: new Date() },
+    { id: 'rep-mock-5', trackingId: 'CC-MOCK-5', category: 'Other', description: 'Stray dogs are causing issues in the residential area of Sector 17.', location: { lat: 30.7415, lng: 76.7766 }, address: 'Sector 17, Chandigarh', status: 'Submitted', isUrgent: false, photoUrl: 'https://resize.indiatvnews.com/en/resize/gallery/840_-/2021/12/cloudburst-in-devprayag-1-1640797324.jpg', submittedAt: new Date(), updatedAt: new Date(), submittedBy: 'Ishaan Reddy' },
     // 6 (Resolved)
-    { id: 'rep-mock-6', trackingId: 'CC-MOCK-6', category: 'Pothole', description: 'Series of potholes on the road to the IT park.', location: { lat: 12.9716, lng: 77.5946 }, address: 'Electronic City, Bengaluru, Karnataka', status: 'Resolved', isUrgent: false, photoUrl: 'https://akm-img-a-in.tosshub.com/indiatoday/images/story/202407/wayanad-visual-explainer-how-landslide-triggered-mud-wall-swept-villages-312238722-16x9_0.jpg?VersionId=WL912oKi2t_sT.kgdx7M5yDu4NTsPHhb&size=690:388', submittedAt: new Date('2024-07-01T10:00:00Z'), updatedAt: new Date('2024-07-08T12:00:00Z') },
+    { id: 'rep-mock-6', trackingId: 'CC-MOCK-6', category: 'Pothole', description: 'Series of potholes on the road to the IT park.', location: { lat: 12.9716, lng: 77.5946 }, address: 'Electronic City, Bengaluru, Karnataka', status: 'Resolved', isUrgent: false, photoUrl: 'https://akm-img-a-in.tosshub.com/indiatoday/images/story/202407/wayanad-visual-explainer-how-landslide-triggered-mud-wall-swept-villages-312238722-16x9_0.jpg?VersionId=WL912oKi2t_sT.kgdx7M5yDu4NTsPHhb&size=690:388', submittedAt: new Date('2024-07-01T10:00:00Z'), updatedAt: new Date('2024-07-08T12:00:00Z'), submittedBy: 'Meera Iyer' },
     // 7 (Resolved)
-    { id: 'rep-mock-7', trackingId: 'CC-MOCK-7', category: 'Traffic Signal Malfunction', description: 'The traffic signal at the main Chennai crossing is stuck on green, very dangerous.', location: { lat: 13.0827, lng: 80.2707 }, address: 'Anna Salai, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: true, photoUrl: 'https://www.reuters.com/resizer/v2/4BQECLG2N5P4JOBWNXZ2TSWPEE.jpg?auth=cde92101b9eb6cb84f575cf45450569fc896d0a994907d2924f54c4b2ff22348&width=1080&quality=80', submittedAt: new Date('2024-07-19T18:00:00Z'), updatedAt: new Date('2024-07-19T20:30:00Z') },
+    { id: 'rep-mock-7', trackingId: 'CC-MOCK-7', category: 'Traffic Signal Malfunction', description: 'The traffic signal at the main Chennai crossing is stuck on green, very dangerous.', location: { lat: 13.0827, lng: 80.2707 }, address: 'Anna Salai, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: true, photoUrl: 'https://www.reuters.com/resizer/v2/4BQECLG2N5P4JOBWNXZ2TSWPEE.jpg?auth=cde92101b9eb6cb84f575cf45450569fc896d0a994907d2924f54c4b2ff22348&width=1080&quality=80', submittedAt: new Date('2024-07-19T18:00:00Z'), updatedAt: new Date('2024-07-19T20:30:00Z'), submittedBy: 'Sameer Khan' },
     // 8 (Resolved)
-    { id: 'rep-mock-8', trackingId: 'CC-MOCK-8', category: 'Overflowing Trash Bin', description: 'Garbage overflowing at Marina Beach entrance.', location: { lat: 13.0500, lng: 80.2824 }, address: 'Marina Beach, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: false, photoUrl: 'https://static.toiimg.com/thumb/msid-66073756,width-748,height-499,resizemode=4,imgsize-199400/Pictures-of-these-gorgeous-Indian-villages-will-make-you-change-your-travel-plans.jpg', submittedAt: new Date('2024-07-14T13:00:00Z'), updatedAt: new Date('2024-07-16T11:00:00Z') },
+    { id: 'rep-mock-8', trackingId: 'CC-MOCK-8', category: 'Overflowing Trash Bin', description: 'Garbage overflowing at Marina Beach entrance.', location: { lat: 13.0500, lng: 80.2824 }, address: 'Marina Beach, Chennai, Tamil Nadu', status: 'Resolved', isUrgent: false, photoUrl: 'https://static.toiimg.com/thumb/msid-66073756,width-748,height-499,resizemode=4,imgsize-199400/Pictures-of-these-gorgeous-Indian-villages-will-make-you-change-your-travel-plans.jpg', submittedAt: new Date('2024-07-14T13:00:00Z'), updatedAt: new Date('2024-07-16T11:00:00Z'), submittedBy: 'Diya Mehta' },
     // 9 (Rejected)
-    { id: 'rep-mock-9', trackingId: 'CC-MOCK-9', category: 'Other', description: 'My neighbour plays loud music. Please tell them to stop.', location: { lat: 28.6139, lng: 77.2090 }, address: 'Connaught Place, New Delhi, Delhi', status: 'Rejected', isUrgent: false, photoUrl: 'https://images.unsplash.com/photo-1586618770443-e6f8167fca61', submittedAt: new Date('2024-07-21T19:00:00Z'), updatedAt: new Date('2024-07-21T19:30:00Z') },
+    { id: 'rep-mock-9', trackingId: 'CC-MOCK-9', category: 'Other', description: 'My neighbour plays loud music. Please tell them to stop.', location: { lat: 28.6139, lng: 77.2090 }, address: 'Connaught Place, New Delhi, Delhi', status: 'Rejected', isUrgent: false, photoUrl: 'https://images.unsplash.com/photo-1586618770443-e6f8167fca61', submittedAt: new Date('2024-07-21T19:00:00Z'), updatedAt: new Date('2024-07-21T19:30:00Z'), submittedBy: 'Kabir Joshi' },
     // 0 -> 10 (Rejected)
-    { id: 'rep-mock-0', trackingId: 'CC-MOCK-0', category: 'Other', description: 'A cat is stuck on my roof.', location: { lat: 17.3850, lng: 78.4867 }, address: 'Charminar, Hyderabad, Telangana', status: 'Rejected', isUrgent: false, photoUrl: 'https://picsum.photos/seed/mock0/400/300', submittedAt: new Date('2024-07-20T19:00:00Z'), updatedAt: new Date('2024-07-20T19:30:00Z') },
+    { id: 'rep-mock-0', trackingId: 'CC-MOCK-0', category: 'Other', description: 'A cat is stuck on my roof.', location: { lat: 17.3850, lng: 78.4867 }, address: 'Charminar, Hyderabad, Telangana', status: 'Rejected', isUrgent: false, photoUrl: 'https://picsum.photos/seed/mock0/400/300', submittedAt: new Date('2024-07-20T19:00:00Z'), updatedAt: new Date('2024-07-20T19:30:00Z'), submittedBy: 'Arjun Sharma' },
      // 11 -> Should also be rejected
-    { id: 'rep-mock-11', trackingId: 'CC-MOCK-11', category: 'Broken Streetlight', description: 'The light is too bright, it shines in my window.', location: { lat: 18.5204, lng: 73.8567 }, address: 'Koregaon Park, Pune, Maharashtra', status: 'Rejected', isUrgent: false, photoUrl: 'https://picsum.photos/seed/mock11/400/300', submittedAt: new Date('2024-07-18T23:00:00Z'), updatedAt: new Date('2024-07-19T09:00:00Z') },
+    { id: 'rep-mock-11', trackingId: 'CC-MOCK-11', category: 'Broken Streetlight', description: 'The light is too bright, it shines in my window.', location: { lat: 18.5204, lng: 73.8567 }, address: 'Koregaon Park, Pune, Maharashtra', status: 'Rejected', isUrgent: false, photoUrl: 'https://picsum.photos/seed/mock11/400/300', submittedAt: new Date('2024-07-18T23:00:00Z'), updatedAt: new Date('2024-07-19T09:00:00Z'), submittedBy: 'Aisha Begum' },
 ];
 
 
@@ -73,7 +78,8 @@ if (reports.length === 0) {
             isUrgent: /hazard|chaos|fallen|major/i.test(description), // Simple logic for urgency
             photoUrl: `https://picsum.photos/seed/report${i}/400/300`,
             submittedAt: submittedAt,
-            updatedAt: new Date(submittedAt.getTime() + Math.random() * 10 * 24 * 60 * 60 * 1000)
+            updatedAt: new Date(submittedAt.getTime() + Math.random() * 10 * 24 * 60 * 60 * 1000),
+            submittedBy: getRandom(submittedByNames),
         });
     }
 }
@@ -138,6 +144,7 @@ export const getRandomReportData = (trackingId: string): Report => {
         photoUrl: `https://picsum.photos/seed/${trackingId}/400/300`,
         submittedAt: submittedAt,
         updatedAt: new Date(submittedAt.getTime() + Math.random() * (status === 'Submitted' ? 0 : 10 * 24 * 60 * 60 * 1000)),
+        submittedBy: getRandom(submittedByNames),
     };
 };
 
@@ -150,6 +157,7 @@ export const addReport = async (reportData: Omit<Report, 'id' | 'submittedAt' | 
         status: 'Submitted',
         submittedAt: now,
         updatedAt: now,
+        submittedBy: 'Anonymous', // New reports are anonymous for now
     };
     reports.unshift(newReport); // Add to the beginning of the array
     return newReport;

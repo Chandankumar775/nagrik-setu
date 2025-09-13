@@ -18,4 +18,5 @@ export interface Report {
   submittedAt: Date;
   updatedAt: Date;
   isUrgent: boolean;
+  submittedBy?: string;
 }
