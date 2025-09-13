@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { addReport, getReportByTrackingId as getReport, getReports as getAllReports, getRandomReportData } from '@/lib/data';
+import { addReport, getReportByTrackingId as getReport, getReports as getAllReports } from '@/lib/data';
 import { intelligentReportCategorization } from '@/ai/flows/intelligent-report-categorization';
 import type { Report, ReportCategory } from '@/lib/types';
 
@@ -68,7 +68,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
     const address = await getAddressFromCoordinates(lat, lng);
 
     // In a real app, you would handle file uploads to a cloud storage (e.g., S3, Firebase Storage)
-    // and get back URLs. For this prototype, we'll use a placeholder URL from picsum.
+    // and get back a URL. For this prototype, we'll use a placeholder URL from picsum.
     const photo = formData.get('photo') as File;
     const photoUrl = photo && photo.size > 0 ? `https://picsum.photos/seed/${Date.now()}/400/300` : undefined;
 
@@ -106,14 +106,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
 
 export async function getReportByTrackingId(trackingId: string): Promise<Report | null> {
     if (!trackingId) return null;
-    const report = await getReport(trackingId);
-    
-    // If a report isn't found, generate a random one for prototype purposes
-    if (!report) {
-        return getRandomReportData(trackingId);
-    }
-    
-    return report;
+    return await getReport(trackingId);
 }
 
 export async function getReports() {
