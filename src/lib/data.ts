@@ -60,6 +60,29 @@ export const getReportByTrackingId = async (trackingId: string): Promise<Report 
     return reports.find(report => report.trackingId === trackingId);
 };
 
+// Generates a random report for prototyping when a tracking ID is not found
+export const getRandomReportData = (trackingId: string): Report => {
+    const submittedAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+    const description = getRandom(descriptions);
+    const status = getRandom(statuses);
+    return {
+        id: `rep-random-${Math.floor(Math.random() * 1000)}`,
+        trackingId: trackingId,
+        category: getRandom(categories),
+        description,
+        location: {
+            lat: 34.0522 + (Math.random() - 0.5) * 0.1,
+            lng: -118.2437 + (Math.random() - 0.5) * 0.1,
+        },
+        address: generateRandomAddress(),
+        status,
+        isUrgent: /hazard|chaos|fallen|major/i.test(description),
+        photoUrl: `https://picsum.photos/seed/${trackingId}/400/300`,
+        submittedAt: submittedAt,
+        updatedAt: new Date(submittedAt.getTime() + Math.random() * (status === 'Submitted' ? 0 : 10 * 24 * 60 * 60 * 1000)),
+    };
+};
+
 export const addReport = async (reportData: Omit<Report, 'id' | 'submittedAt' | 'updatedAt' | 'status'>): Promise<Report> => {
     await new Promise(resolve => setTimeout(resolve, 300));
     const now = new Date();
