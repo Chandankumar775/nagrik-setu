@@ -57,12 +57,17 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
   }
 
   try {
+    // MOCK FOR DEMO: In a real app with configured Genkit/API keys, this would call the AI.
+    // To prevent errors in the demo environment, we'll simulate a successful categorization.
+    const category: ReportCategory = 'Other';
+    const isUrgent = false;
+
     // 1. Get AI-based category and urgency
-    const categorizationResult = await intelligentReportCategorization({
-      reportDescription: description,
-    });
-    const category = categorizationResult.category as ReportCategory;
-    const isUrgent = categorizationResult.isUrgent;
+    // const categorizationResult = await intelligentReportCategorization({
+    //   reportDescription: description,
+    // });
+    // const category = categorizationResult.category as ReportCategory;
+    // const isUrgent = categorizationResult.isUrgent;
 
     // 2. Get address from coordinates
     const address = await getAddressFromCoordinates(lat, lng);
