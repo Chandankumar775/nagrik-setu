@@ -32,15 +32,12 @@ export function Header() {
              <Button variant="ghost" asChild>
                 <Link href="#">Contact</Link>
             </Button>
-            <div className="relative">
-                 <Image src="https://i.postimg.cc/zBZXPtFF/Jharkhand-Rajakiya-Chihna-svg.webp" alt="Jharkhand Government Logo" width={60} height={60} className="absolute inset-0 m-auto opacity-20" />
-                <Button variant="outline" asChild>
-                    <Link href="/admin">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Admin Panel
-                    </Link>
-                </Button>
-            </div>
+            <Button variant="outline" asChild>
+                <Link href="/admin">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Panel
+                </Link>
+            </Button>
         </nav>
       </div>
     </header>
