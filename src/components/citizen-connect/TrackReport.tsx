@@ -27,14 +27,13 @@ const statusIcons: Record<ReportStatus, React.ReactNode> = {
 
 export function TrackReport() {
   const searchParams = useSearchParams();
-  const initialId = searchParams.get('id') || '';
-  const [trackingId, setTrackingId] = useState(initialId);
+  const [trackingId, setTrackingId] = useState('');
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const handleSearch = () => {
-    if (!trackingId) {
+  const handleSearch = (idToSearch: string) => {
+    if (!idToSearch) {
       setError('Please enter a tracking ID.');
       setReport(null);
       return;
@@ -42,16 +41,16 @@ export function TrackReport() {
     setError(null);
     startTransition(async () => {
       try {
-        const result = await getReportByTrackingId(trackingId);
+        const result = await getReportByTrackingId(idToSearch);
         if (result) {
           setReport(result);
           // Update URL without reloading page
-          window.history.pushState({}, '', `/track?id=${trackingId}`);
+          window.history.pushState({}, '', `/track?id=${idToSearch}`);
         } else {
-          // If a report isn't found, generate a random one for prototype purposes
-          const randomReport = await getReportByTrackingId(trackingId)
-          setReport(randomReport);
-          window.history.pushState({}, '', `/track?id=${trackingId}`);
+          // If a report isn't found, use our mock data logic
+          const mockReport = await getReportByTrackingId(idToSearch);
+          setReport(mockReport);
+          window.history.pushState({}, '', `/track?id=${idToSearch}`);
         }
       } catch (e) {
           setReport(null);
@@ -61,8 +60,10 @@ export function TrackReport() {
   };
   
   useEffect(() => {
+    const initialId = searchParams.get('id');
     if (initialId) {
-      handleSearch();
+      setTrackingId(initialId);
+      handleSearch(initialId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -76,10 +77,10 @@ export function TrackReport() {
           placeholder="Enter your tracking ID (e.g., CC-123456)"
           value={trackingId}
           onChange={(e) => setTrackingId(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch(trackingId)}
           className="text-base"
         />
-        <Button type="submit" onClick={handleSearch} disabled={isPending || !trackingId}>
+        <Button type="submit" onClick={() => handleSearch(trackingId)} disabled={isPending || !trackingId}>
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
           <span className="sr-only">Search</span>
         </Button>
