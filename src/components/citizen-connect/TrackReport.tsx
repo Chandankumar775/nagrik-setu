@@ -27,7 +27,7 @@ const statusInfo: Record<ReportStatus, { icon: React.ReactNode, text: string, co
 
 export function TrackReport() {
   const searchParams = useSearchParams();
-  const [trackingId, setTrackingId] = useState('');
+  const [trackingId, setTrackingId] = useState(searchParams.get('id') || '');
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -59,11 +59,10 @@ export function TrackReport() {
   useEffect(() => {
     const initialId = searchParams.get('id');
     if (initialId) {
-      setTrackingId(initialId);
       handleSearch(initialId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
 
   return (
