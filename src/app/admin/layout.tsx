@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Image src="https://i.postimg.cc/zBZXPtFF/Jharkhand-Rajakiya-Chihna-svg.webp" alt="Jharkhand Government Logo" width={40} height={40} />
             </div>
             <span className="font-headline text-xl font-bold tracking-tight text-sidebar-foreground">
-              Urban Dons Admin
+              Nagrik Setu Admin
             </span>
           </div>
         </SidebarHeader>
