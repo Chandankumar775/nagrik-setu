@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Footer } from '@/components/citizen-connect/Footer';
 
 export const metadata: Metadata = {
-  title: 'Urban Dons',
+  title: 'Nagrik Setu',
   description: 'Report civic issues and help improve your community in Jharkhand.',
 };
 

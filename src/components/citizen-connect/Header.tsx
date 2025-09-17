@@ -14,7 +14,7 @@ export function Header() {
                 </div>
                <div>
                 <span className="font-headline text-xl font-bold tracking-tight text-primary">
-                    Urban Dons
+                    Nagrik Setu
                 </span>
                  <p className="text-xs text-muted-foreground font-semibold">An Initiative by Government of Jharkhand</p>
                </div>
