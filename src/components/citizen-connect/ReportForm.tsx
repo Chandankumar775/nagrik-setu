@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState, useActionState } from 'react';
+import { useEffect, useState, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, Mic } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Loader2, MapPin, Send, CheckCircle, XCircle, FileImage, Mic, Camera } from 'lucide-react';
 import { submitReport, type FormState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -14,6 +16,13 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
 import { Card, CardContent } from '../ui/card';
 import { useToast } from '@/hooks/use-toast';
+
+const FormSchema = z.object({
+  description: z.string().min(10, { message: "Please describe the issue in at least 10 characters."}),
+  photo: z.any().optional(),
+  latitude: z.string().refine(val => val, { message: "Please capture your location." }),
+  longitude: z.string().refine(val => val, { message: "Please capture your location." }),
+});
 
 
 function SubmitButton() {
@@ -31,13 +40,15 @@ export function ReportForm() {
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [locationError, setLocationError] = useState<string | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
+  const [fileName, setFileName] = useState('');
   
   const { toast } = useToast();
 
   const initialState: FormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(submitReport, initialState);
   
-  const form = useForm({
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       description: '',
       photo: undefined,
@@ -46,7 +57,7 @@ export function ReportForm() {
     },
   });
 
-  const { setValue } = form;
+  const { setValue, trigger, formState: { errors } } = form;
 
   useEffect(() => {
     if (state.message) {
@@ -54,6 +65,7 @@ export function ReportForm() {
       if(!state.errors) {
         form.reset();
         setLocationStatus('idle');
+        setFileName('');
       }
     }
   }, [state, form]);
@@ -72,10 +84,16 @@ export function ReportForm() {
         setValue('latitude', position.coords.latitude.toString());
         setValue('longitude', position.coords.longitude.toString());
         setLocationStatus('success');
+        trigger(['latitude', 'longitude']); // Manually trigger validation
       },
       (error) => {
         setLocationStatus('error');
-        setLocationError(`Error: ${error.message}. Please enable location services in your browser/OS settings.`);
+        setLocationError(`Error: ${error.message}. Please enable location services.`);
+         toast({
+          variant: 'destructive',
+          title: 'Location Error',
+          description: `Error: ${error.message}. Please enable location services.`,
+        });
       }
     );
   };
@@ -91,7 +109,7 @@ export function ReportForm() {
               <FormItem>
                 <FormLabel>Issue Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Describe the issue you're facing." {...field} />
+                  <Textarea placeholder="e.g., 'Large pothole on the main road causing traffic jams'" {...field} rows={4} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,17 +122,25 @@ export function ReportForm() {
                <FormField
                 control={form.control}
                 name="photo"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-normal flex items-center gap-2 cursor-pointer border rounded-md p-2 hover:bg-muted transition-colors"><FileImage className="w-4 h-4 text-muted-foreground"/>Photo (Optional)</FormLabel>
+                    <FormLabel htmlFor="photo-upload" className="font-normal w-full flex items-center gap-2 cursor-pointer border rounded-md p-3 hover:bg-muted transition-colors data-[error=true]:border-destructive">
+                      <FileImage className="w-4 h-4 text-muted-foreground"/>
+                      <span className="truncate">{fileName || 'Upload Photo (Optional)'}</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="file" accept="image/*" {...form.register('photo')} className="sr-only" />
+                      <Input id="photo-upload" type="file" accept="image/*" className="sr-only" 
+                        onChange={(e) => {
+                          field.onChange(e.target.files ? e.target.files[0] : null);
+                          setFileName(e.target.files?.[0]?.name || '');
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="button" variant="outline" className="h-auto" onClick={() => toast({ title: 'Feature not implemented', description: 'This is a placeholder for voice recording.'})}>
+              <Button type="button" variant="outline" className="h-auto p-3" onClick={() => toast({ title: 'Feature not implemented', description: 'This is a placeholder for voice recording.'})}>
                   <div className="flex items-center gap-2">
                     <Mic className="w-4 h-4 text-muted-foreground" />
                     <span>Voice Note (Optional)</span>
@@ -123,34 +149,25 @@ export function ReportForm() {
             </div>
           </div>
           
+          <FormItem>
+              <FormLabel>Location</FormLabel>
+              <div className="flex gap-2 items-start">
+                  <Button type="button" variant="outline" onClick={handleGetLocation} disabled={locationStatus === 'loading'} data-success={locationStatus === 'success'} data-error={!!errors.latitude}>
+                      {locationStatus === 'loading' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {locationStatus === 'success' ? <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> : <MapPin className="mr-2 h-4 w-4" />}
+                      {locationStatus === 'success' ? 'Location Captured' : 'Get Current Location'}
+                  </Button>
+              </div>
+               {locationError && <p className="text-sm font-medium text-destructive">{locationError}</p>}
+               <FormMessage>{errors.latitude?.message}</FormMessage>
 
-          <FormField
-            control={form.control}
-            name="latitude"
-            render={({ field }) => (
-              <FormItem>
-                 <FormLabel>Location</FormLabel>
-                <div className="flex gap-2 items-start">
-                    <Button type="button" variant="outline" onClick={handleGetLocation} disabled={locationStatus === 'loading'}>
-                        {locationStatus === 'loading' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {locationStatus === 'success' ? <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> : <MapPin className="mr-2 h-4 w-4" />}
-                        {locationStatus === 'success' ? 'Location Captured' : 'Get Current Location'}
-                    </Button>
-                </div>
-                 {locationError && <p className="text-sm font-medium text-destructive">{locationError}</p>}
-                 <FormMessage />
-
-                <FormControl>
-                  <Input type="hidden" {...field} />
-                </FormControl>
-                <FormField
-                    control={form.control}
-                    name="longitude"
-                    render={({ field: longField }) => <FormControl><Input type="hidden" {...longField} /></FormControl>}
-                />
-              </FormItem>
-            )}
-          />
+              <FormControl>
+                <>
+                  <Input type="hidden" {...form.register('latitude')} />
+                  <Input type="hidden" {...form.register('longitude')} />
+                </>
+              </FormControl>
+          </FormItem>
           
           {state.errors?._form && (
             <Alert variant="destructive">
@@ -159,6 +176,14 @@ export function ReportForm() {
               <AlertDescription>{state.errors._form.join(', ')}</AlertDescription>
             </Alert>
           )}
+          {state.errors?.latitude && (
+            <Alert variant="destructive">
+                <XCircle className="h-4 w-4" />
+                <AlertTitle>Location Required</AlertTitle>
+                <AlertDescription>Please capture your location before submitting.</AlertDescription>
+            </Alert>
+           )}
+
 
           <SubmitButton />
         </form>
@@ -180,7 +205,7 @@ export function ReportForm() {
                     <DialogDescription>{state.message}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                    <p>Thank you for helping improve our community. You can track the status of your report using the ID below.</p>
+                    <p>Thank you for helping improve our community. Your report has been categorized as <span className='font-bold'>{state.report?.category}</span> and marked as {state.report?.isUrgent ? <span className='font-bold text-destructive'>Urgent</span> : 'not urgent'}.</p>
                     <Card className="bg-muted/50">
                         <CardContent className="p-4">
                             <p className="text-sm text-muted-foreground">Your Tracking ID</p>
