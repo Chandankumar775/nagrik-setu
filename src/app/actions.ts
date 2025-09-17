@@ -77,7 +77,7 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
 
     // 3. Handle photo upload if present
     let photoUrl: string | undefined;
-    if (photo && photo.size > 0) {
+    if (photo instanceof File && photo.size > 0) {
         photoUrl = await uploadPhoto(photo);
     } else {
         photoUrl = 'https://assets.zeezest.com/blogs/PROD_india_villages_travel_1651054984192.jpg';
