@@ -42,78 +42,31 @@ async function uploadPhoto(photo: File): Promise<string> {
 
 
 export async function submitReport(prevState: FormState, formData: FormData): Promise<FormState> {
-  const validatedFields = ReportSchema.safeParse({
-    description: formData.get('description'),
-    latitude: formData.get('latitude'),
-    longitude: formData.get('longitude'),
-  });
   
-  if (!validatedFields.success) {
-    return {
-      message: 'Validation failed.',
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
+  // Create a hardcoded mock report for demonstration purposes
+  const mockReport: Report = {
+    id: `rep-mock-${Date.now()}`,
+    trackingId: `CC-${String(Date.now()).slice(-6)}`,
+    description: formData.get('description') as string || "This is a mocked report. A large pothole was reported on the main road, causing significant traffic disruption and potential danger to motorists.",
+    category: 'Pothole',
+    location: { lat: 23.3441, lng: 85.3096 }, // Mocked coordinates for Ranchi
+    address: 'Mock Address, Near Main Road, Ranchi, Jharkhand',
+    photoUrl: 'https://d3i6fh83elv35t.cloudfront.net/static/2020/05/2020-05-21T100018Z_383787307_RC2WSG9NQ3MW_RTRMADP_3_ASIA-STORM-INDIA-1024x696.jpg',
+    isUrgent: true,
+    submittedBy: 'Rajesh Kumar',
+    status: 'Submitted',
+    submittedAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  const { description, latitude, longitude } = validatedFields.data;
-  const photo = formData.get('photo') as File | null;
+  // Revalidate the admin path to simulate the new report appearing on the dashboard
+  revalidatePath('/admin');
   
-  const lat = parseFloat(latitude);
-  const lng = parseFloat(longitude);
-
-  if (isNaN(lat) || isNaN(lng)) {
-      return {
-          message: 'Invalid location data. Please ensure location is captured correctly.',
-          errors: { _form: ['Invalid location data.'] },
-      }
-  }
-
-  try {
-    // 1. Intelligent Categorization & Urgency Detection
-    const aiResult = await intelligentReportCategorization({ reportDescription: description });
-    
-    // 2. Get address from coordinates
-    const address = await getAddressFromCoordinates(lat, lng);
-
-    // 3. Handle photo upload if present
-    let photoUrl: string | undefined;
-    if (photo instanceof File && photo.size > 0) {
-        photoUrl = await uploadPhoto(photo);
-    } else {
-        photoUrl = 'https://assets.zeezest.com/blogs/PROD_india_villages_travel_1651054984192.jpg';
-    }
-
-    // 4. Generate tracking ID
-    const trackingId = `CC-${String(Date.now()).slice(-6)}`;
-
-    // 5. Save to our "database"
-    const newReport = await addReport({
-      trackingId,
-      description,
-      category: aiResult.category as any, // Cast because AI can return any string
-      location: { lat, lng },
-      address,
-      photoUrl,
-      isUrgent: aiResult.isUrgent,
-      submittedBy: 'Rajesh Kumar', // Mock submitter name
-    });
-    
-    // 6. Revalidate admin path to show new report
-    revalidatePath('/admin');
-    
-    // 7. Return success state with the new report
-    return {
-      message: 'Report submitted successfully!',
-      report: newReport,
-    };
-  } catch (error) {
-    console.error(error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return {
-      message: 'An unexpected error occurred during submission.',
-      errors: { _form: [errorMessage] },
-    }
-  }
+  // Return a successful state with the complete mock report data
+  return {
+    message: 'Report submitted successfully!',
+    report: mockReport,
+  };
 }
 
 export async function getReportByTrackingId(trackingId: string): Promise<Report | null> {
