@@ -61,8 +61,10 @@ export default function Home() {
 
 function FeatureCard({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) {
     return (
-        <div className="flex items-start gap-4 rounded-lg p-2 transition-colors hover:bg-card">
-            <Icon className="mt-1 h-6 w-6 text-accent" />
+        <div className="flex items-start gap-4 rounded-lg border bg-card p-4 transition-all hover:bg-secondary hover:shadow-md">
+            <div className="bg-accent/10 p-2 rounded-full">
+              <Icon className="h-6 w-6 text-accent" />
+            </div>
             <div>
                 <h3 className="font-semibold">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
