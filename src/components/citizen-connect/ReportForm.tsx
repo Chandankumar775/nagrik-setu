@@ -160,14 +160,11 @@ export function ReportForm() {
               </div>
                {locationError && <p className="text-sm font-medium text-destructive">{locationError}</p>}
                <FormMessage>{errors.latitude?.message}</FormMessage>
-
-              <FormControl>
-                <>
-                  <Input type="hidden" {...form.register('latitude')} />
-                  <Input type="hidden" {...form.register('longitude')} />
-                </>
-              </FormControl>
           </FormItem>
+
+          {/* Hidden fields for lat/lng */}
+          <Input type="hidden" {...form.register('latitude')} />
+          <Input type="hidden" {...form.register('longitude')} />
           
           {state.errors?._form && (
             <Alert variant="destructive">
