@@ -124,12 +124,12 @@ This project is the result of the hard work and collaboration of a dedicated tea
 
 | Name         | Role                |
 |--------------|---------------------|
-| **Chandan**  | 👑 Team Lead        |
-| **Pranjal**  | 💻 Core Developer   |
-| **Ishita**   | 🎨 UI/UX Designer   |
+| **Chandan**  | 👑 Team Lead, Backend Engineer        |
+| **Pranjal**  | 💻 Core Developer, Security and Devops   |
+| **Ishita**   | 🎨 UI/UX Designer, Frontend Developer   |
 | **Kirti**    | 🧠 AI Specialist    |
-| **Krish**    | 📊 Backend Developer|
-| **Aditya**   | 📝 Documentation    |
+| **Krish**    | 📊 Mobile App Developer|
+| **Aditya**   | 📝 UI/UX design    |
 
 ---
 
