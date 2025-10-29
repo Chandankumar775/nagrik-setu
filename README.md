@@ -28,7 +28,7 @@ This project was proudly developed as a prototype for the **Smart India Hackatho
 
 ## ✨ Key Features
 
-Nagrik Setu is built with two primary user experiences in mind: the public-facing citizen portal and the administrative dashboard.
+Nagrik Setu is built with three primary user experiences in mind: the public-facing citizen portal, the AI-powered student help assistant, and the administrative dashboard.
 
 ### 🚶 For Citizens
 
@@ -38,6 +38,15 @@ Nagrik Setu is built with two primary user experiences in mind: the public-facin
 - **AI-Powered Categorization**: Our intelligent backend, powered by Google's Gemini, automatically analyzes the report description to assign a category (e.g., "Pothole", "Water Leak") and assess its urgency.
 - **Real-Time Tracking**: Receive a unique tracking ID upon submission to monitor the status of your report from "Submitted" to "Resolved".
 - **Responsive Design**: A fully responsive and accessible UI that works beautifully on any device, from mobile phones to desktops.
+
+### 🎓 For Students
+
+- **AI Study Assistant**: Get instant help with homework, assignments, and academic questions through an intelligent chatbot.
+- **Subject Explanations**: Receive clear explanations on Math, Science, English, History, and more subjects.
+- **Study Tips & Strategies**: Learn effective study techniques, time management, and exam preparation strategies.
+- **Career Guidance**: Explore educational pathways and career options tailored to your interests.
+- **Interactive Learning**: Ask follow-up questions and get personalized responses based on your grade level and subject.
+- **24/7 Availability**: Access educational support anytime, anywhere through the AI-powered chatbot.
 
 ### 🛡️ For Administrators
 
@@ -60,7 +69,7 @@ The application is built using a modern, robust, and scalable technology stack.
   - **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
   - **ShadCN UI**: A collection of beautifully designed, accessible, and reusable components.
 - **Generative AI**:
-  - **Genkit (with Google AI)**: An open-source framework for building production-ready AI flows. We use Google's Gemini model for intelligent report categorization.
+  - **Genkit (with Google AI)**: An open-source framework for building production-ready AI flows. We use Google's Gemini model for intelligent report categorization and student help assistance.
 - **Deployment**:
   - **Firebase App Hosting**: For scalable, secure, and easy-to-manage hosting.
 
@@ -107,8 +116,9 @@ To get a local copy up and running, follow these simple steps.
 3.  **Set up environment variables:**
     Create a `.env` file in the root of the project and add your Google AI API Key.
     ```
-    GEMINI_API_KEY=YOUR_API_KEY_HERE
+    GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
     ```
+    You can get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
 
 4.  **Run the development server:**
     This command starts both the Next.js frontend and the Genkit AI flows concurrently.

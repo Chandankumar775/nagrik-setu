@@ -3,8 +3,9 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { addReport, getReportByTrackingId as getReport, getReports as getAllReports } from '@/lib/data';
-import type { Report } from '@/lib/types';
+import type { Report, ChatMessage } from '@/lib/types';
 import { intelligentReportCategorization } from '@/ai/flows/intelligent-report-categorization';
+import { studentHelpChatbot } from '@/ai/flows/student-help-chatbot';
 
 // Schema for form submission (still useful for type safety, but not enforced on client)
 const ReportSchema = z.object({
@@ -71,9 +72,70 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
 
 export async function getReportByTrackingId(trackingId: string): Promise<Report | null> {
     if (!trackingId) return null;
-    return await getReport(trackingId);
+    const report = await getReport(trackingId);
+    return report ?? null;
 }
 
 export async function getReports() {
     return await getAllReports();
+}
+
+// Chatbot Actions
+export interface ChatbotResponse {
+  message: ChatMessage;
+  suggestedQuestions?: string[];
+  error?: string;
+}
+
+export async function sendChatMessage(
+  conversationHistory: ChatMessage[],
+  userMessage: string,
+  studentContext?: { grade?: string; subject?: string }
+): Promise<ChatbotResponse> {
+  try {
+    // Add the new user message to history
+    const newUserMessage: ChatMessage = {
+      id: `msg-${Date.now()}-user`,
+      role: 'user',
+      content: userMessage,
+      timestamp: new Date(),
+    };
+
+    // Prepare messages for the AI flow
+    const messages = [...conversationHistory, newUserMessage].map(msg => ({
+      role: msg.role,
+      content: msg.content,
+      timestamp: msg.timestamp.toISOString(),
+    }));
+
+    // Call the AI chatbot flow
+    const response = await studentHelpChatbot({
+      messages,
+      studentContext,
+    });
+
+    // Create the assistant message
+    const assistantMessage: ChatMessage = {
+      id: `msg-${Date.now()}-assistant`,
+      role: 'assistant',
+      content: response.response,
+      timestamp: new Date(),
+    };
+
+    return {
+      message: assistantMessage,
+      suggestedQuestions: response.suggestedQuestions,
+    };
+  } catch (error) {
+    console.error('Error in sendChatMessage:', error);
+    return {
+      message: {
+        id: `msg-${Date.now()}-assistant`,
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error processing your request. Please try again.',
+        timestamp: new Date(),
+      },
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
 }
