@@ -20,3 +20,22 @@ export interface Report {
   isUrgent: boolean;
   submittedBy?: string;
 }
+
+// Chat types for student help chatbot
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export interface ChatSession {
+  id: string;
+  messages: ChatMessage[];
+  startedAt: Date;
+  updatedAt: Date;
+  studentContext?: {
+    grade?: string;
+    subject?: string;
+  };
+}
