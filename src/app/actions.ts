@@ -71,7 +71,8 @@ export async function submitReport(prevState: FormState, formData: FormData): Pr
 
 export async function getReportByTrackingId(trackingId: string): Promise<Report | null> {
     if (!trackingId) return null;
-    return await getReport(trackingId);
+    const report = await getReport(trackingId);
+    return report ?? null;
 }
 
 export async function getReports() {
