@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield } from 'lucide-react';
+import { Shield, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -33,6 +33,12 @@ export function Header() {
             </Button>
             <Button variant="ghost" asChild>
                 <Link href="/track">Track Report</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+                <Link href="/chatbot">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    AI Study Help
+                </Link>
             </Button>
              <Button variant="ghost" asChild>
                 <Link href="#">About</Link>
