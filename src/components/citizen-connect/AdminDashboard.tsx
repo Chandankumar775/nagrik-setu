@@ -201,7 +201,7 @@ export function AdminDashboard({ reports }: { reports: Report[] }) {
                                 {filteredReports.map(report => (
                                     <TableRow key={report.id} onClick={() => setSelectedReport(report)} className="cursor-pointer">
                                         <TableCell className="font-medium flex items-center gap-2">
-                                            {report.isUrgent && <ShieldAlert className="w-4 h-4 text-destructive" titleAccess='Urgent' />}
+                                            {report.isUrgent && <ShieldAlert className="w-4 h-4 text-destructive" aria-label="Urgent" />}
                                             {categoryIcons[report.category] || categoryIcons['Other']}
                                             {report.category}
                                         </TableCell>
@@ -253,7 +253,7 @@ function ReportDetailsSheet({ report, onOpenChange }: { report: Report | null, o
                     <>
                     <SheetHeader>
                         <SheetTitle className="font-headline text-2xl flex items-center gap-2 text-primary">
-                            {report.isUrgent && <ShieldAlert className="w-6 h-6 text-destructive" titleAccess='Urgent' />}
+                            {report.isUrgent && <ShieldAlert className="w-6 h-6 text-destructive" aria-label="Urgent" />}
                             {report.category}
                         </SheetTitle>
                         <SheetDescription>Details for report <span className="font-mono">{report.trackingId}</span></SheetDescription>
