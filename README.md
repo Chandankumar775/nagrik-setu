@@ -1,10 +1,10 @@
 <div align="center">
 
-# Nagrik Setu
+<img src="docs/brand/wordmark.webp" alt="Nagrik Setu" width="100%">
 
 **A civic issue reporting platform for Jharkhand: citizens report potholes, broken streetlights and water leaks in seconds; administrators see, sort and resolve them.**
 
-Smart India Hackathon prototype by Team Urban Dons
+[Live demo](https://nagrik-setu-jharkhand.vercel.app) · Smart India Hackathon prototype by Team Urban Dons
 
 <img src="docs/screenshots/home.webp" alt="Nagrik Setu: Report a Civic Issue, Improve Your Community" width="100%">
 
